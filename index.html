@@ -13888,41 +13888,48 @@ $\geq n^{3} /(2 M)^{1 / 2}-M=\Omega\left(n^{3} / M^{1 / 2}\right)$</p>
 <h3 id="Let's-take-up-the-Parallel-Case-now:-apply-reasoning-to-one-processor-out-of-$P$-of-them:">Let's take up the Parallel Case now: apply reasoning to one processor out of $P$ of them:<a class="anchor-link" href="#Let's-take-up-the-Parallel-Case-now:-apply-reasoning-to-one-processor-out-of-$P$-of-them:">&#182;</a></h3><ul>
 <li><p>$\#$ of Adds and Muls $\geq 2 n^{3} / P$ (at least one processor does this many calculations)</p>
 </li>
-<li><p>$\mathrm{M}=\mathrm{n}^{2} / \mathrm{P}$ (each processor gets equal fraction of matrix)</p>
+<li><p>$ M = n^{2} / P$ (each processor gets equal fraction of matrix)</p>
 </li>
 <li><p>$\#$ of "Load &amp; Stores" $=\#$ of words moved from or to other processors 
-$\geq \mathrm{M} \cdot\left(2 \mathrm{n}^{3} / \mathrm{P}\right) / \mathrm{F}=\mathrm{M} \cdot\left(2 \mathrm{n}^{3} / \mathrm{P}\right) /(2 \mathrm{M})^{3 / 2}=\mathrm{n}^{2} /(2 \mathrm{P})^{1 / 2}$</p>
+$\geq M \cdot (2 n^{3} / P) / F = M \cdot (2 n^{3} / P) /(2M)^{3 / 2} = n^{2} /(2 P)^{1 / 2}$</p>
 </li>
 </ul>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Probabilistic-Analysis-of-Product-of-Uniformly-Distributed-Sparse-Matrices-(ER(d)-Matrix)">Probabilistic Analysis of Product of Uniformly Distributed Sparse Matrices (<em>ER(d) Matrix</em>)<a class="anchor-link" href="#Probabilistic-Analysis-of-Product-of-Uniformly-Distributed-Sparse-Matrices-(ER(d)-Matrix)">&#182;</a></h2><p><em>Reference: Demmel et al., Communication Optimal Parallel Multiplication
+of Sparse Random Matrices (Refer [23] in the paper)</em></p>
+<p>In order to study algorithms which assign contiguous bricks of voxels to processors and find clever ways of calculating matrix products, we categorize these
+algorithms into 1D, 2D, and 3D algorithms, as shown in the figure below, depending on the dimensions of the brick of voxels assigned to each processor: 1D algorithms correspond
+to bricks with two dimensions of length n (and 1 shorter),
+2D algorithms correspond to bricks with one dimension of
+length n (and 2 shorter), and 3D algorithms correspond to
+bricks with all 3 dimensions shorter than n.</p>
+<p><img src="compcube3.JPG" alt="Drawing" style="width: 130px;"/></p>
+<p>BUT in order to answer the communication complexity costs of these 1D, 2D and 3D algorithms, we need to answer a few questions about these Erdos-Renyi Matrices which we answer as follows. We assume that an $n \times n$ $ER(d)$ matrix is an adjacency matrix of an Erdós-Rényi graph with parameters $n$ and $d/n$, that is, <em>a square matrix of dimension $n$ where each entry is nonzero with probability $d/n$</em>. We assume $d \ll \sqrt{n}$.</p>
+<p>Let $\mathbf{A}$ and $\mathbf{B}$ be $n \times n$ $ER(d)$ matrices. Then:</p>
+<ul>
+<li>the expected number of nonzeros in $\mathbf{A}$ and in $\mathbf{B}$ is $d n$</li>
+<li>the expected number of scalar multiplications in $\mathbf{A} \cdot \mathbf{B}$ is $d^{2} n,$ and</li>
+<li>the expected number of nonzeros in $\mathbf{C}$ is $d^{2} n(1-o(1))$</li>
+</ul>
+<h4 id="Proof.">Proof.<a class="anchor-link" href="#Proof.">&#182;</a></h4><ul>
+<li><p>Since each entry of $\mathbf{A}$ and $\mathbf{B}$ is nonzero with probability $d / n,$ the expected number of nonzeros in each matrix is $n^{2}(d / n)=d n .$</p>
+</li>
+<li><p>For each of the possible $n^{3}$ scalar multiplications in $\mathbf{A} \cdot \mathbf{B},$ the computation is required only if both corresponding entries of $\mathbf{A}$ and $\mathbf{B}$ are nonzero, which are independent events. Thus the probability that any multiplication is required is $d^{2} / n^{2},$ and the expected number of scalar multiplications is $d^{2} n .$</p>
+</li>
+<li><p>Finally, an entry of $\mathbf{C}=\mathbf{A} \cdot \mathbf{B}$ is zero only if all $n$ possible scalar multiplications corresponding to it are zero. since the probability that a given scalar multiplication is zero is $\left(1-d^{2} / n^{2}\right)$ and the $n$ possible scalar multiplications corresponding to a single output entry are independent, the probability that an entry of $\mathbf{C}$ is zero is $\left(1-d^{2} / n^{2}\right)^{n}=1-d^{2} / n+O\left(d^{4} / n^{2}\right) .$ Thus the expected num-
+ber of nonzeros of $\mathbf{C}$ is $n^{2}\left(d^{2} / n-O\left(d^{4} / n^{2}\right)\right)=d^{2} n(1-o(1))$
+since we have already assumed above that $d \ll \sqrt{n}$.</p>
+</li>
+</ul>
 
-    </div>
 </div>
 </div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
-</div>
-</div>
-
 </div>
     </div>
   </div>
