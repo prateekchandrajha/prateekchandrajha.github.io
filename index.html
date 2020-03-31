@@ -14077,6 +14077,48 @@ since we have already assumed above that $d \ll \sqrt{n}$.</p>
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Comprehensible-Summary-of-Section-IV-of-the-Paper:-Parallel-MATMUL-Algorithms-(Note:-Only-Sparse-Matrix-A-to-be-passed-around-the-Processors)">Comprehensible Summary of Section IV of the Paper: Parallel MATMUL Algorithms (Note: Only Sparse Matrix A to be passed around the Processors)<a class="anchor-link" href="#Comprehensible-Summary-of-Section-IV-of-the-Paper:-Parallel-MATMUL-Algorithms-(Note:-Only-Sparse-Matrix-A-to-be-passed-around-the-Processors)">&#182;</a></h3><ul>
+<li>1D algorithms partition only one dimension of the computational cuboid, i.e., slicing the cuboid into planes.</li>
+<li>2D algorithms split two dimensions of the computational cuboid, e.g., pencils of length $l$. They logically arrange processors into a 2D grid of size $p_m$ × $p_n$.</li>
+</ul>
+<table>
+<thead><tr>
+<th>Parallel Algorithm</th>
+<th>Illustration</th>
+<th>Explanation &amp; Communication Costs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1D Blocked Column (For c=1)</td>
+<td><img src="1dmatmul.jpg" alt="Drawing" style="width: 340px;"/></td>
+<td>$A$ is cyclically shifted by one processor to another one. Each round a processor sends one message of size $nnz(A)/p$ words. $S = O(p)$, $W = O(nnz(A))$</td>
+</tr>
+<tr>
+<td>1D Blocked Inner Product (For c=1)</td>
+<td><img src="1innerp.jpg" alt="Drawing" style="width: 340px;"/></td>
+<td>For $p$ rounds, each processor calculates a corresponding $n/p$ × $n/p$ submatrix of $C$ using the locally available $A$ and $B$, and shifts $A$ cyclically by one. Same comm. costs as above. $S = O(p)$, $W = O(nnz(A))$</td>
+</tr>
+<tr>
+<td>1D Blocked Row/Column Outer Product</td>
+<td><img src="1dblock.jpg" alt="Drawing" style="width: 340px;"/></td>
+<td>Authors skip this because this algo requires the dense matrices $B$ and $C$ also to be passed around the processors. The illustration makes it clear as to why.</td>
+</tr>
+<tr>
+<td>2D SUMMA ($p_{m}=p_{n}=\sqrt{p}$ and c=1)</td>
+<td><img src="2dsumma.jpg" alt="Drawing" style="width: 340px;"/></td>
+<td>All processors do the multiplication and accumulate the product in their local $C$'s. There are $\sqrt{p}$ broadcasts of $A$ ($\log \sqrt{p}$ messages and $nnz(A) / p$ words each) and $\sqrt{p}$ broadcasts of $B$ ($\log \sqrt{p}$ messages and $nnz(B) / p$ words each). $S=O(2 \sqrt{p} \log \sqrt{p}),W=O\left(\frac{nnz(A)+nnz(B)}{\sqrt{p}} \log \sqrt{p}\right)</td>
+</tr>
+</tbody>
+</table>
+<p>$ |</p>
+
+</div>
+</div>
+</div>
     </div>
   </div>
 </body>
