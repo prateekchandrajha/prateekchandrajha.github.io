@@ -14085,6 +14085,22 @@ recently developed, and it has applications in information and algorithmic theor
 <p>For any nonnegative $a_{i j}, b_{j k}, c_{k i}$ with $1 \leq i, j, k \leq n$ one has the triple product inequality:$$\sum_{i, j, k=1}^{n} a_{i j}^{\frac{1}{2}} b_{j k}^{\frac{1}{2}} c_{k i}^{\frac{1}{2}} \leq\left\{\sum_{i, j=1}^{n} a_{i j}\right\}^{\frac{1}{2}}\left\{\sum_{j, k=1}^{n} b_{j k}\right\}^{\frac{1}{2}}\left\{\sum_{k, i=1}^{n} c_{k i}\right\}^{\frac{1}{2}}$$</p>
 <p>Let $A$ denote a finite set of points in $\mathbb{Z}^{3}$ and let $A_{x}, A_{y}, A_{z}$ denote the projections of $A$ onto the corresponding coordinate planes that are orthogonal to the $x, y,$ or $z$ -axes. Let $|B|$ denote the cardinality of a set $B \subset \mathbb{Z}^{3}$, then the projections provide an upper bound on the cardinality of $A:$
 $$|A| \leq\left|A_{x}\right|^{\frac{1}{2}}\left|A_{y}\right|^{\frac{1}{2}}\left|A_{z}\right|^{\frac{1}{2}}$$</p>
+<h4 id="Proof.">Proof.<a class="anchor-link" href="#Proof.">&#182;</a></h4><p><em>Reference: Tiskin(2002), interestingly enough we found that it was posed as a problem on the 33rd International Mathematical Olympiad (Moscow, 1992), Snapshot attached below after outlining the proof</em></p>
+$$
+\begin{aligned}
+\sum_{1 \leq i, j, k \leq n} a_{i j}^{\frac{1}{2}} b_{j k}^{\frac{1}{2}} c_{k i}^{\frac{1}{2}} &amp;=\sum_{1 \leq i, k \leq n} c_{k i}^{\frac{1}{2}}\left\{\sum_{j=1}^{n} a_{i j}^{\frac{1}{2}} b_{j k}^{\frac{1}{2}}\right\} \\
+&amp; \leq \sum_{1 \leq i, k \leq n} c_{k i}^{\frac{1}{2}}\left\{\sum_{j=1}^{n} a_{i j}\right\}^{\frac{1}{2}}\left\{\sum_{j=1}^{n} b_{j k}\right\}^{\frac{1}{2}} \\
+&amp;=\sum_{k=1}^{n}\left\{\sum_{j=1}^{n} b_{j k}\right\}^{\frac{1}{2}}\left(\sum_{i=1}^{n} c_{k i}^{\frac{1}{2}}\left\{\sum_{j=1}^{n} a_{i j}\right\}^{\frac{1}{2}}\right)
+\end{aligned}
+$$<p>which is bounded in turn by
+$$
+\begin{aligned}
+\sum_{k=1}^{n} &amp;\left\{\sum_{j=1}^{n} b_{j k}\right\}^{\frac{1}{2}}\left\{\sum_{i=1}^{n} c_{k i}\right\}^{\frac{1}{2}}\left\{\sum_{1 \leq i, j \leq n} a_{i j}\right\}^{\frac{1}{2}} \\
+&amp;=\left\{\sum_{1 \leq i, j \leq n} a_{i j}\right\}^{\frac{1}{2}}\left\{\sum_{k=1}^{n}\left(\sum_{j=1}^{n} b_{j k}\right)^{\frac{1}{2}}\left(\sum_{i=1}^{n} c_{k i}\right)^{\frac{1}{2}}\right\} \\
+&amp; \leq\left\{\sum_{1 \leq i, j \leq n} a_{i j}\right\}^{\frac{1}{2}}\left\{\sum_{1 \leq j, k \leq n} b_{j k}\right\}^{\frac{1}{2}}\left\{\sum_{1 \leq k, i \leq n} c_{k i}\right\}^{\frac{1}{2}}
+\end{aligned}
+$$</p>
+<h4 id="IMO-1992-Problem-5-(Day-2,-Problem-2)">IMO 1992 Problem 5 (Day 2, Problem 2)<a class="anchor-link" href="#IMO-1992-Problem-5-(Day-2,-Problem-2)">&#182;</a></h4><p><img src="imoloomis.JPG" alt="Drawing" style="width: 450px;"/></p>
 
 </div>
 </div>
