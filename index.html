@@ -13118,11 +13118,11 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="LAA-Project-Introduction:-Sparse-Matrices-&amp;-SpMM,-SpDM,-SpMV-Operations-&amp;-Communication-Avoiding-Algorithms">LAA Project Introduction: Sparse Matrices &amp; SpMM, SpDM, SpMV Operations &amp; Communication Avoiding Algorithms<a class="anchor-link" href="#LAA-Project-Introduction:-Sparse-Matrices-&amp;-SpMM,-SpDM,-SpMV-Operations-&amp;-Communication-Avoiding-Algorithms">&#182;</a></h1><p><em>Group Members: Prateek Chandra Jha, Tanmey Rawal, Saikrishna Ranganathan, Ashray Anand</em></p>
 <p><em>Project Topic: Pursuing literature survey of communication measurement/avoidance methods/strategies in matrix multiplication algorithms, implementation of key parallelism features in scientific computing environment like Python and understanding how multithreading and multiprocessing operations work behind the scenes in making these algorithms work</em></p>
-<p><em>Last Updated: 01/04/2020 18:29 Hrs</em></p>
+<p><em>Last Updated: 02/04/2020 18:21 Hrs</em></p>
 <p>This notebook discusses the paper which we have studied for fulfilling the requirements of an attached course project: <strong>Communication-Avoiding Parallel Sparse-Dense Matrix-Matrix Multiplication</strong> (<a href="http://people.eecs.berkeley.edu/~yelick/papers/spdm3_ipdps16.pdf">http://people.eecs.berkeley.edu/~yelick/papers/spdm3_ipdps16.pdf</a>) by Penporn Koanantakool, Ariful Azad, Aydın Buluc, Dmitriy Morozov, Sang-Yun Oh, Leonid Oliker, Katherine Yelick.</p>
 <p>The sparse matrix computation is a key in wide range of applications of science and engineering (we have mentioned a few of them as propounded in the paper below). <strong><em>The irregular computations involved in this kind of operations make its optimization challenging.</em></strong> Therefore, enormous effort has been devoted to devise data formats to store the sparse matrix with the ultimate aim of maximizing the performance. Nowadays Graphics Processing Units (GPUs) are platforms that yield outstanding acceleration factors.</p>
 <p>Our initial preliminary report discussed one of the many data storage formats for sparse matrices: CSR (Compressed Sparse Row). <strong><em>Compressed sparse row (CSR)</em></strong> and <strong><em>Compressed sparse column (CSC)</em></strong> are widely known and most used formats of sparse data structures. Mainly, they are used for write-once-read-many tasks.</p>
-<h2 id="Multiplication-of-a-sparse-matrix-with-a-dense-matrix-:-$SpDM$">Multiplication of a sparse matrix with a dense matrix : $SpDM$<a class="anchor-link" href="#Multiplication-of-a-sparse-matrix-with-a-dense-matrix-:-$SpDM$">&#182;</a></h2><ol>
+<h2 id="Core-Topic:-Multiplication-of-a-sparse-matrix-with-a-dense-matrix-:-$SpDM$">Core Topic: Multiplication of a sparse matrix with a dense matrix : $SpDM$<a class="anchor-link" href="#Core-Topic:-Multiplication-of-a-sparse-matrix-with-a-dense-matrix-:-$SpDM$">&#182;</a></h2><ol>
 <li><p>Most previous work on parallel matrix multiplication
 considered only both dense or both sparse matrix operands.</p>
 </li>
@@ -13136,11 +13136,116 @@ in dense-dense and sparse-sparse cases — outperform the 2D
 and 3D variants both theoretically and in practice for sparse-dense multiplication.</p>
 </li>
 </ol>
-<p>Existing
-parallel algorithms for multiplying sparse matrices perform
-reasonably well in practice for limited processor counts, but
-their scaling is impaired by <strong><em>increased communication costs
-at high concurrency</em></strong>.</p>
+<h3 id="The-Meat-of-the-Paper:-Speeds-&amp;-Heirarchy-of-Memory,-Locality-of-Computations-(Reduction-of-Communications),-Vectorization,-Scaling,-Parallelization">The Meat of the Paper: Speeds &amp; Heirarchy of Memory, Locality of Computations (Reduction of Communications), Vectorization, Scaling, Parallelization<a class="anchor-link" href="#The-Meat-of-the-Paper:-Speeds-&amp;-Heirarchy-of-Memory,-Locality-of-Computations-(Reduction-of-Communications),-Vectorization,-Scaling,-Parallelization">&#182;</a></h3><p><em>Reference: Rachel Thomas, UCSF <a href="https://github.com/fastai/numerical-linear-algebra">https://github.com/fastai/numerical-linear-algebra</a></em></p>
+<p>Let's start with the concept of Vectorization which we bumped into while learning numpy/pandas in Python. Modern CPUs and GPUs can apply an operation to multiple elements at once on a single core. For instance, take the exponent of 4 floats in a vector in a single step (see the code below). This is called <strong><em>SIMD</em></strong>. Explicitly writing SIMD code tends to require assembly language or special C "intrinsics", but instead we use vectorized operations in libraries like numpy, which in turn rely on specially tuned vectorized low level linear algebra APIs (in particular, BLAS, and LAPACK). These abstractions let you use these powerful linear algebra subroutines without any lower level C knowledge.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># numpy array costs 3.26 microseconds on average to square a 1000 integers</span>
+<span class="n">v</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)])</span>
+<span class="o">%</span><span class="k">timeit</span> v**2
+<span class="c1"># simple list comprehensions without any vectorizations cost 691 microseconds on average</span>
+<span class="c1"># observe a stark difference in performance bounds</span>
+<span class="c1">#v=[i for i in range(1000)]</span>
+<span class="o">%</span><span class="k">timeit</span> [i**2 for i in range(1000)]
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>3.25 µs ± 266 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+769 µs ± 40.5 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="What-was-the-Original-Goal-of-LAPACK?">What was the Original Goal of LAPACK?<a class="anchor-link" href="#What-was-the-Original-Goal-of-LAPACK?">&#182;</a></h3><ul>
+<li>The original goal to build over BLAS (Basic Linear Algebra Subprograms), EISPACK (eigenvalue routines) and LINPACK (linear equations and linear least-squares routines) libraries was to make LINAPCK and EISPACK run efficiently on shared-memory vector and parallel processors and exploit cache on modern cache-based architectures (initially released in 1992). </li>
+<li>EISPACK and LINPACK ignore multi-layered memory hierarchies and spend too much time moving data around.</li>
+<li>LAPACK uses highly optimized block operations implementations (which much be implemented on each machine) LAPACK written so as much of the computation as possible is performed by BLAS.</li>
+</ul>
+<h3 id="Why-is-Locality/Communication-Avoidance-the-next-frontier-of-Algorithmic-Research?">Why is Locality/Communication Avoidance the next frontier of Algorithmic Research?<a class="anchor-link" href="#Why-is-Locality/Communication-Avoidance-the-next-frontier-of-Algorithmic-Research?">&#182;</a></h3><p><em>Reference: Jeff Dean, <a href="https://research.google/people/jeff/">https://research.google/people/jeff/</a> and <a href="https://static.googleusercontent.com/media/research.google.com/en/us/people/jeff/stanford-295-talk.pdf">https://static.googleusercontent.com/media/research.google.com/en/us/people/jeff/stanford-295-talk.pdf</a> for Latency Chart Image</em></p>
+<ul>
+<li>Using slower ways to access data (e.g. over the internet) can be up to a billion times slower than faster ways (e.g. from a register). But there's much less fast storage than slow storage. </li>
+<li>So once we have data in fast storage, we want to do any computation required at that time, rather than having to load it multiple times each time we need it. </li>
+<li>In addition, for most types of storage its much faster to access data items that are stored next to each other, so we should try to always use any data stored nearby that we know we'll need soon. </li>
+<li><strong><em>These two issues are known as locality</em></strong>.</li>
+</ul>
+<p><img src="latency.JPG" alt="Drawing" style="width: 650px;"/></p>
+<h3 id="If-you-want-to-have-one-takeaway-from-the-latency-chart-by-Jeff-Dean-above,-what's-that?">If you want to have one takeaway from the latency chart by Jeff Dean above, what's that?<a class="anchor-link" href="#If-you-want-to-have-one-takeaway-from-the-latency-chart-by-Jeff-Dean-above,-what's-that?">&#182;</a></h3><p>Each successive memory type is (at least) an order of magnitude worse than the one before it and hence, <strong><em>Disk seeks are very slow</em></strong>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">YouTubeVideo</span>
+<span class="n">YouTubeVideo</span><span class="p">(</span><span class="s2">&quot;3uiEyEKji0M&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[5]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+
+        <iframe
+            width="400"
+            height="300"
+            src="https://www.youtube.com/embed/3uiEyEKji0M"
+            frameborder="0"
+            allowfullscreen
+        ></iframe>
+        
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h4 id="Why-achieving-scalability-for-parallel-algorithms-for-sparse-matrix-problems-is-challenging?-(Explained-in-detail-later)">Why achieving scalability for parallel algorithms for sparse matrix problems is challenging? (Explained in detail later)<a class="anchor-link" href="#Why-achieving-scalability-for-parallel-algorithms-for-sparse-matrix-problems-is-challenging?-(Explained-in-detail-later)">&#182;</a></h4><ol>
 <li>The computations tend
 not to have the surface to volume ratio (or potential for
@@ -13337,6 +13442,19 @@ For dense matrix computations, blocking techniques are an efficient means to exp
 <ul>
 <li>Sparsity turns up every time we see a kaggle dataset where questions like whether or not a user has watched a movie in a movie catalog, whether or not a user has purchased a product in a product catalog</li>
 <li>preparation or pre-processing of data which are basically encoding schemes in almost all of the following cases yield sparsity: <em>One hot encoding</em> used to represent categorical data as sparse binary vectors, <em>Count encoding</em> used to represent the frequency of words in a vocabulary for a document, <em>TF-IDF encoding</em> used to represent normalized word frequency scores in a vocabulary</li>
+</ul>
+<p>Here we see an example of Non-Negative Matrix Factorization and think about it: <strong><em>Nonnegativity induces sparsity</em></strong>. Nonnegativity leads to part-based decompositions. "Atoms energy cancellation" is not allowed: once an atom is selected with some energy, it cannot be further concealed by other atoms. Data is often nonnegative by nature: <em>(Reference: <a href="https://perso.telecom-paristech.fr/essid/teach/NMF_tutorial_ICME-2014.pdf">https://perso.telecom-paristech.fr/essid/teach/NMF_tutorial_ICME-2014.pdf</a>)</em></p>
+
+<pre><code>- pixel intensities;
+- amplitude spectra;
+- occurrence counts;
+- food or energy consumption;
+- user scores;
+- stock market values
+
+</code></pre>
+<p><img src="termdoc.JPG" alt="Drawing" style="width: 500px;"/></p>
+<ul>
 <li>Some areas of study within machine learning must develop specialized methods to address
 sparsity directly as the input data is almost always sparse. These include: <em>Natural language processing (NLP)</em> for working with documents of text, <em>Recommender systems</em> for working with product usage within a catalog, Computer vision when working with <em>images that contain lots of black pixels</em></li>
 </ul>
@@ -13914,7 +14032,8 @@ dense matrix calculations Finished in 0.05 second(s)
   <img src="sparse.JPG" alt="Drawing" style="width: 450px;"/>
   <figcaption>Some standard forms for sparse matrices are as illustrated beautifully in the figure above:  (a) Band-diagonal; (b) block triangular; (c) block tridiagonal; (d) singly bordered block diagonal; (e) doubly bordered block diagonal; (f) singly bordered block triangular; (g) bordered band-triangular; (h) and (i) singly and doubly bordered band-diagonal; (j) and (k) other! (after Tewarson). <i>Reference: Section 2.7 Sparse Linear Systems, Numerical Recipes: The Art of Scientific Computing,
       Third Edition, 2007.</i></figcaption>
-</figure>
+</figure><p><em>Important Thing To Keep In Mind</em>: These special types of structured matrices, such as diagonal, tri-diagonal, hessenberg, and triangular, which each display particular patterns of sparsity, can be leveraged to reduce memory and computation. As we saw above, the opposite of a sparse matrix is a dense matrix, along with dense storage, which simply refers to a matrix containing mostly non-zeros, in which every element is stored explicitly. Since sparse matrices are helpful and common, numerical linear algebra focuses on maintaining sparsity through as many operations in a computation as possible.</p>
+
 </div>
 </div>
 </div>
