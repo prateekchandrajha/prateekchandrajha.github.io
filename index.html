@@ -13118,7 +13118,7 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="LAA-Project-Introduction:-Sparse-Matrices-&amp;-SpMM,-SpDM,-SpMV-Operations-&amp;-Communication-Avoiding-Algorithms">LAA Project Introduction: Sparse Matrices &amp; SpMM, SpDM, SpMV Operations &amp; Communication Avoiding Algorithms<a class="anchor-link" href="#LAA-Project-Introduction:-Sparse-Matrices-&amp;-SpMM,-SpDM,-SpMV-Operations-&amp;-Communication-Avoiding-Algorithms">&#182;</a></h1><p><em>Group Members: Prateek Chandra Jha, Tanmey Rawal, Saikrishna Ranganathan, Ashray Anand</em></p>
 <p><em>Project Topic: Pursuing literature survey of communication measurement/avoidance methods/strategies in matrix multiplication algorithms, implementation of key parallelism features in scientific computing environment like Python and understanding how multithreading and multiprocessing operations work behind the scenes in making these algorithms work</em></p>
-<p><em>Last Updated: 02/04/2020 18:21 Hrs</em></p>
+<p><em>Last Updated: 06/04/2020 02:52 Hrs</em></p>
 <p>This notebook discusses the paper which we have studied for fulfilling the requirements of an attached course project: <strong>Communication-Avoiding Parallel Sparse-Dense Matrix-Matrix Multiplication</strong> (<a href="http://people.eecs.berkeley.edu/~yelick/papers/spdm3_ipdps16.pdf">http://people.eecs.berkeley.edu/~yelick/papers/spdm3_ipdps16.pdf</a>) by Penporn Koanantakool, Ariful Azad, Aydın Buluc, Dmitriy Morozov, Sang-Yun Oh, Leonid Oliker, Katherine Yelick.</p>
 <p>The sparse matrix computation is a key in wide range of applications of science and engineering (we have mentioned a few of them as propounded in the paper below). <strong><em>The irregular computations involved in this kind of operations make its optimization challenging.</em></strong> Therefore, enormous effort has been devoted to devise data formats to store the sparse matrix with the ultimate aim of maximizing the performance. Nowadays Graphics Processing Units (GPUs) are platforms that yield outstanding acceleration factors.</p>
 <p>Our initial preliminary report discussed one of the many data storage formats for sparse matrices: CSR (Compressed Sparse Row). <strong><em>Compressed sparse row (CSR)</em></strong> and <strong><em>Compressed sparse column (CSC)</em></strong> are widely known and most used formats of sparse data structures. Mainly, they are used for write-once-read-many tasks.</p>
@@ -13136,7 +13136,7 @@ in dense-dense and sparse-sparse cases — outperform the 2D
 and 3D variants both theoretically and in practice for sparse-dense multiplication.</p>
 </li>
 </ol>
-<h3 id="The-Meat-of-the-Paper:-Speeds-&amp;-Heirarchy-of-Memory,-Locality-of-Computations-(Reduction-of-Communications),-Vectorization,-Scaling,-Parallelization">The Meat of the Paper: Speeds &amp; Heirarchy of Memory, Locality of Computations (Reduction of Communications), Vectorization, Scaling, Parallelization<a class="anchor-link" href="#The-Meat-of-the-Paper:-Speeds-&amp;-Heirarchy-of-Memory,-Locality-of-Computations-(Reduction-of-Communications),-Vectorization,-Scaling,-Parallelization">&#182;</a></h3><p><em>Reference: Rachel Thomas, UCSF <a href="https://github.com/fastai/numerical-linear-algebra">https://github.com/fastai/numerical-linear-algebra</a></em></p>
+<h3 id="The-Meat-of-the-Paper:-Speeds-&amp;-Hierarchy-of-Memory,-Locality-of-Computations-(Reduction-of-Communications),-Vectorization,-Scaling,-Parallelization">The Meat of the Paper: Speeds &amp; Hierarchy of Memory, Locality of Computations (Reduction of Communications), Vectorization, Scaling, Parallelization<a class="anchor-link" href="#The-Meat-of-the-Paper:-Speeds-&amp;-Hierarchy-of-Memory,-Locality-of-Computations-(Reduction-of-Communications),-Vectorization,-Scaling,-Parallelization">&#182;</a></h3><p><em>Reference: Rachel Thomas, UCSF <a href="https://github.com/fastai/numerical-linear-algebra">https://github.com/fastai/numerical-linear-algebra</a></em></p>
 <p>Let's start with the concept of Vectorization which we bumped into while learning numpy/pandas in Python. Modern CPUs and GPUs can apply an operation to multiple elements at once on a single core. For instance, take the exponent of 4 floats in a vector in a single step (see the code below). This is called <strong><em>SIMD</em></strong>. Explicitly writing SIMD code tends to require assembly language or special C "intrinsics", but instead we use vectorized operations in libraries like numpy, which in turn rely on specially tuned vectorized low level linear algebra APIs (in particular, BLAS, and LAPACK). These abstractions let you use these powerful linear algebra subroutines without any lower level C knowledge.</p>
 
 </div>
@@ -13184,6 +13184,354 @@ and 3D variants both theoretically and in practice for sparse-dense multiplicati
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="What's-the-absolute-and-relative-speeds-of-most-common-operations-in-the-various-computational-frameworks?">What's the absolute and relative speeds of most common operations in the various computational frameworks?<a class="anchor-link" href="#What's-the-absolute-and-relative-speeds-of-most-common-operations-in-the-various-computational-frameworks?">&#182;</a></h3><p><em>Reference: Sourya Dey, PhD Student, Neural Networks, University of Southern California. (GitHub: <a href="https://souryadey.github.io/">https://souryadey.github.io/</a>)</em></p>
+<h4 id="Array-Search-Comparison:-Numpy-is-doubly-fast-than-Python-Lists-(See-Code-Below)">Array Search Comparison: Numpy is doubly fast than Python Lists (See Code Below)<a class="anchor-link" href="#Array-Search-Comparison:-Numpy-is-doubly-fast-than-Python-Lists-(See-Code-Below)">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="n">num</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">4</span>
+
+<span class="n">n_permute</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+<span class="n">permuted</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">n_permute</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;List Operations Took:&#39;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> [permuted.index(i) for i in range(num)]
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Numpy Operations Took:&#39;</span><span class="p">)</span> <span class="c1"># The magics %% should start from the first line by convention</span>
+<span class="c1"># Therefore ran in the next cell (a small trick worth remembering!)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>List Operations Took:
+16.5 s ± 971 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+Numpy Operations Took:
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>it 
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">n_permute</span><span class="o">==</span><span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>310 ms ± 17.7 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Search-Compute-Times-in-Numpy:-All-Methods-More-or-Less-Equally-Efficient">Search Compute Times in Numpy: All Methods More or Less Equally Efficient<a class="anchor-link" href="#Search-Compute-Times-in-Numpy:-All-Methods-More-or-Less-Equally-Efficient">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">8</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">num</span><span class="p">)</span> <span class="c1"># Return random integers from low (inclusive) to high (exclusive)</span>
+
+<span class="sd">&quot;&quot;&quot;Returns a tuple of arrays, one for each dimension of a, </span>
+<span class="sd">containing the indices of the non-zero elements in that dimension.&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using np.nonzero&#39;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> x[np.nonzero(x==5)[0]]
+
+<span class="c1"># Return elements chosen from x or y depending on condition/conditionals</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using np.where&#39;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> x[np.where(x==5)[0]]
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using indexing conditionals&#39;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> x[x==5]
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Using np.nonzero
+724 ms ± 29.8 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+Using np.where
+746 ms ± 47.9 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+Using indexing conditionals
+770 ms ± 30.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Array-Construction-Times-in-Lists-vs-Numpy:-Lists-are-MUCH-MUCH-FASTER!">Array Construction Times in Lists vs Numpy: Lists are MUCH MUCH FASTER!<a class="anchor-link" href="#Array-Construction-Times-in-Lists-vs-Numpy:-Lists-are-MUCH-MUCH-FASTER!">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">4</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;List Building Took:&#39;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> x = [i for i in range(num)]
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Numpy Array Building Took:&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>List Building Took:
+957 µs ± 119 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+
+
+Numpy Array Building Took:
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>it 
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>130 ms ± 7.53 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Computation-Time-for-Numpy-Element-Indexing-Using-Conditionals:-Same-Time-Performance">Computation Time for Numpy Element Indexing Using Conditionals: Same Time Performance<a class="anchor-link" href="#Computation-Time-for-Numpy-Element-Indexing-Using-Conditionals:-Same-Time-Performance">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">8</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">num</span><span class="p">)</span> <span class="c1"># generating (num) of random numbers between 0-9 inclusive of both</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using &amp;&#39;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> (2&lt;x) &amp; (x&lt;8)
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using np.logical_and&#39;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> np.logical_and(2&lt;x,x&lt;8)
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using np.all&#39;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> np.all([2&lt;x,x&lt;8],axis=0)
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Using &amp;
+575 ms ± 69.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+Using np.logical_and
+550 ms ± 7.92 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+Using np.all
+707 ms ± 59.1 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Computation-Time-for-$1000$-x-$1000$-Matrix-Multiplication:-PyTorch-vs.-TensorFlow-vs.-Numpy-(PyTorch-Wins!)">Computation Time for $1000$ x $1000$ Matrix Multiplication: PyTorch vs. TensorFlow vs. Numpy (PyTorch Wins!)<a class="anchor-link" href="#Computation-Time-for-$1000$-x-$1000$-Matrix-Multiplication:-PyTorch-vs.-TensorFlow-vs.-Numpy-(PyTorch-Wins!)">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="c1">#import tensorflow as tf</span>
+<span class="kn">import</span> <span class="nn">tensorflow.compat.v1</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="n">tf</span><span class="o">.</span><span class="n">disable_v2_behavior</span><span class="p">()</span>
+<span class="n">matsize</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Numpy time&#39;</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">anp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">matsize</span><span class="p">,</span><span class="n">matsize</span><span class="p">)</span>
+<span class="n">bnp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">matsize</span><span class="p">,</span><span class="n">matsize</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> np.dot(anp,bnp)
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Torch time&#39;</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">atorch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">matsize</span><span class="p">,</span><span class="n">matsize</span><span class="p">)</span>
+<span class="n">btorch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">matsize</span><span class="p">,</span><span class="n">matsize</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> torch.mm(atorch,btorch)
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tensorflow time&#39;</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">atf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">anp</span><span class="p">)</span>
+<span class="n">btf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">bnp</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="o">%</span><span class="k">timeit</span> sess.run(tf.matmul(atf,btf))
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Numpy time 
+
+69.2 ms ± 5.45 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+
+
+Torch time 
+
+30.7 ms ± 2.78 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+
+
+Tensorflow time 
+
+756 ms ± 61.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="What-was-the-Original-Goal-of-LAPACK?">What was the Original Goal of LAPACK?<a class="anchor-link" href="#What-was-the-Original-Goal-of-LAPACK?">&#182;</a></h3><ul>
 <li>The original goal to build over BLAS (Basic Linear Algebra Subprograms), EISPACK (eigenvalue routines) and LINPACK (linear equations and linear least-squares routines) libraries was to make LINAPCK and EISPACK run efficiently on shared-memory vector and parallel processors and exploit cache on modern cache-based architectures (initially released in 1992). </li>
 <li>EISPACK and LINPACK ignore multi-layered memory hierarchies and spend too much time moving data around.</li>
@@ -13204,7 +13552,7 @@ and 3D variants both theoretically and in practice for sparse-dense multiplicati
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">YouTubeVideo</span>
@@ -13221,7 +13569,7 @@ and 3D variants both theoretically and in practice for sparse-dense multiplicati
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[5]:</div>
+    <div class="prompt output_prompt">Out[9]:</div>
 
 
 
