@@ -13118,7 +13118,7 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="LAA-Project-Introduction:-Sparse-Matrices-&amp;-SpMM,-SpDM,-SpMV-Operations-&amp;-Communication-Avoiding-Algorithms">LAA Project Introduction: Sparse Matrices &amp; SpMM, SpDM, SpMV Operations &amp; Communication Avoiding Algorithms<a class="anchor-link" href="#LAA-Project-Introduction:-Sparse-Matrices-&amp;-SpMM,-SpDM,-SpMV-Operations-&amp;-Communication-Avoiding-Algorithms">&#182;</a></h1><p><em>Group Members: Prateek Chandra Jha, Tanmey Rawal, Saikrishna Ranganathan, Ashray Anand</em></p>
 <p><em>Project Topic: Pursuing literature survey of communication measurement/avoidance methods/strategies in matrix multiplication algorithms, implementation of key parallelism features in scientific computing environment like Python and understanding how multithreading and multiprocessing operations work behind the scenes in making these algorithms work</em></p>
-<p><em>Last Updated: 06/04/2020 17:26 Hrs</em></p>
+<p><em>Last Updated: 07/04/2020 02:42 Hrs</em></p>
 <p>This notebook discusses the paper which we have studied for fulfilling the requirements of an attached course project: <strong>Communication-Avoiding Parallel Sparse-Dense Matrix-Matrix Multiplication</strong> (<a href="http://people.eecs.berkeley.edu/~yelick/papers/spdm3_ipdps16.pdf">http://people.eecs.berkeley.edu/~yelick/papers/spdm3_ipdps16.pdf</a>) by Penporn Koanantakool, Ariful Azad, Aydın Buluc, Dmitriy Morozov, Sang-Yun Oh, Leonid Oliker, Katherine Yelick.</p>
 <p>The sparse matrix computation is a key in wide range of applications of science and engineering (we have mentioned a few of them as propounded in the paper below). <strong><em>The irregular computations involved in this kind of operations make its optimization challenging.</em></strong> Therefore, enormous effort has been devoted to devise data formats to store the sparse matrix with the ultimate aim of maximizing the performance. Nowadays Graphics Processing Units (GPUs) are platforms that yield outstanding acceleration factors.</p>
 <p>Our initial preliminary report discussed one of the many data storage formats for sparse matrices: CSR (Compressed Sparse Row). <strong><em>Compressed sparse row (CSR)</em></strong> and <strong><em>Compressed sparse column (CSC)</em></strong> are widely known and most used formats of sparse data structures. Mainly, they are used for write-once-read-many tasks.</p>
@@ -15049,6 +15049,126 @@ since we have already assumed above that $d \ll \sqrt{n}$.</p>
 </tr>
 </tbody>
 </table>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Appendix:-Eclectic-Mix-of-Intuitive-Ideas,-Lemmas,-Proofs">Appendix: Eclectic Mix of Intuitive Ideas, Lemmas, Proofs<a class="anchor-link" href="#Appendix:-Eclectic-Mix-of-Intuitive-Ideas,-Lemmas,-Proofs">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="What-Makes-Krylov-subspaces-so-Special?-Closely-related-to-the-derivation-of-the-conjugate-gradient-method:-How-Krylov-subspace-is-the-space-spanned-by-the-vectors-of-successive-directions-of-steepest-decent?">What Makes Krylov subspaces so Special? Closely related to the derivation of the conjugate gradient method: How Krylov subspace is the space spanned by the vectors of successive directions of steepest decent?<a class="anchor-link" href="#What-Makes-Krylov-subspaces-so-Special?-Closely-related-to-the-derivation-of-the-conjugate-gradient-method:-How-Krylov-subspace-is-the-space-spanned-by-the-vectors-of-successive-directions-of-steepest-decent?">&#182;</a></h3><p><em>Reference: An Introduction to the Conjugate Gradient Method Without the Agonizing Pain Edition $1 \frac{1}{4}$ by Jonathan Richard Shewchuk (August 4, 1994): <a href="https://webdocs.cs.ualberta.ca/~rgreiner/C-466/SLIDES/painless-conjugate-gradient.pdf">https://webdocs.cs.ualberta.ca/~rgreiner/C-466/SLIDES/painless-conjugate-gradient.pdf</a>, <a href="https://math.stackexchange.com/questions/2704957/what-makes-krylov-subspaces-so-special/">https://math.stackexchange.com/questions/2704957/what-makes-krylov-subspaces-so-special/</a></em></p>
+<p>Assume, we have an initial guess $x_{0}$ for our solution $x$ of the linear system
+$$
+A x=b
+$$
+where $A$ is a symmetric, positive definit matrix. Let us denote the error by $e_{0}$
+$$
+e_{0}:=x-x_{0}
+$$
+Furthermore, let the residual
+$$
+r_{0}:=b-A x_{0}
+$$
+We now want to make a correction step of the form
+$$
+x_{1}=x_{0}+p
+$$
+to improve our approximation, where $p$ is some vector that we still need to determine. The error after the correction $e_{1}$ is
+$$
+e_{1}=x-x_{1}=x-\left(x_{0}+p\right)=e_{0}-p
+$$
+We take a look at the $A$ -norm of the error; we have that
+$$
+\begin{aligned}
+\left\|e_{0}-p\right\|_{A}^{2} &amp;=\left\langle A e_{0}-A p, e_{0}-p\right\rangle \\
+&amp;=\left\langle A e_{0}, e_{0}\right\rangle-\left\langle A e_{0}, p\right\rangle-\left\langle A p, e_{0}\right\rangle+\langle A p, p\rangle \\
+&amp;=\left\langle A e_{0}, e_{0}\right\rangle-2\left\langle A e_{0}, p\right\rangle+\langle A p, p\rangle \\
+&amp;=c-2\left\langle r_{0}, p\right\rangle+\langle A p, p\rangle
+\end{aligned}
+$$</p>
+<p>where we have used that $A e_{0}=r_{0}$ and where $c$ is some constant independent of $p .$ Let us define the function $\phi$ by setting
+$$
+\phi(p)=\langle A p, p\rangle-2\left\langle r_{0}, p\right\rangle+c
+$$
+The function $\phi$ is just the error of $e_{1}$ in dependence of the correction $p$ measured in the $A$ -norm. Hence, we want to choose $p$ such that $\phi(p)$ is small. For this purpose, we compute the gradient of $\phi$
+A small computation which uses the symmetry of $A$ gives that
+$$
+\nabla \phi(p)=2\left(A p-r_{0}\right)
+$$
+Recall that the negative of the gradient always points in the direction in which the function decreases the most. At position $x_{0},$ where $p=0,$ we have that
+$$
+\nabla \phi(0)=-2 r_{0}
+$$
+Thus, the function $\phi$ decreases the most in the direction of the residual $r_{0} .$ This direction, is also called the direction of steepest decent.
+For this reason, assume that we choose $p=\alpha_{0} r_{0}$ for some scalar $\alpha .$ In the next step, we choose, again, a vector $p$ and add its value to the current iterate. Using the same argument we choose $\alpha_{1} r_{1}$ for some scalar $\alpha_{2} .$ We continue in this manner. Thus, we have that
+$$
+x_{k+1}=x_{0}+\alpha_{0} r_{0}+\alpha_{1} r_{1}+\cdots+\alpha_{k} r_{k}
+$$
+in other words that
+$$
+x_{k+1} \in x_{0}+\operatorname{span}\left\{r_{0}, r_{1}, \ldots, r_{k}\right\}
+$$
+Now, using the relation that
+$$
+r_{k+1}=b-A x_{k+1}=b-A\left(x_{k}+\alpha_{k} r_{k}\right)=r_{k}-\alpha_{k} A r_{k}
+$$
+we see that
+$$
+\operatorname{span}\left\{r_{0}, r_{1}, \ldots, r_{k}\right\}=\operatorname{span}\left\{r_{0}, A r_{0}, \ldots, A^{k-1} r_{0}\right\}
+$$
+Hence, a Krylov subspace is the space spanned by the vectors of successive directions of steepest decent.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Tricks-Behind-Rayleigh-Quotient-Iterations">Tricks Behind Rayleigh Quotient Iterations<a class="anchor-link" href="#Tricks-Behind-Rayleigh-Quotient-Iterations">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Understanding-the-usage-of-Cholesky-in-Sparse-Positive-Definite-Matrices">Understanding the usage of Cholesky in Sparse Positive Definite Matrices<a class="anchor-link" href="#Understanding-the-usage-of-Cholesky-in-Sparse-Positive-Definite-Matrices">&#182;</a></h3><p><em>Reference: <a href="http://www.seas.ucla.edu/~vandenbe/133A/lectures/chol.pdf">http://www.seas.ucla.edu/~vandenbe/133A/lectures/chol.pdf</a></em></p>
+<p>Cholesky factorization of dense matrices takes $(1 / 3) n^{3}$ flops. On a standard computer: a few seconds or less, for $n$ up to several 1000.</p>
+<p><strong><em>Cholesky factorization of Sparse Matrices</em></strong>:</p>
+<ul>
+<li>If $A$ is very sparse, $R$ is often (but not always) sparse</li>
+<li>If $R$ is sparse, the cost of the factorization is much less than $(1 / 3) n^{3}$</li>
+<li>Exact cost depends on $n$, number of nonzero elements, sparsity pattern</li>
+<li>Very large sets of equations can be solved by exploiting sparsity (Have a look at the images below)</li>
+</ul>
+<p><img src="sparsechol.JPG" alt="Drawing" style="width: 500px;"/></p>
+<p><strong><em>Sparse Cholesky Factorization</em></strong>: If $A$ is sparse and positive definite, it is usually factored as
+$$
+A=P R^{T} R P^{T}
+$$
+where $P$ a permutation matrix; $R$ upper triangular with positive diagonal elements.</p>
+<p><strong><em>Interpretation</em></strong>: We permute the rows and columns of $A$ and factor
+$$
+P^{T} A P=R^{T} R
+$$</p>
+<ul>
+<li>choice of permutation greatly affects the sparsity $R$</li>
+<li>there exist several heuristic methods for choosing a good permutation</li>
+</ul>
+<p><strong><em>Algorithm</em></strong>: Solve $A x=b$ with $A$ a sparse positive definite matrix:</p>
+<ol>
+<li>compute sparse Cholesky factorization $A=P R^{T} R P^{T}$</li>
+<li>permute right-hand side: $c:=P^{T} b$</li>
+<li>solve $R^{T} y=c$ by forward substitution</li>
+<li>solve $R z=y$ by back substitution</li>
+<li>permute solution: $x:=P z$</li>
+</ol>
 
 </div>
 </div>
