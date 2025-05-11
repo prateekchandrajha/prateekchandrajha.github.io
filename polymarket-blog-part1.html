@@ -128,6 +128,37 @@
                 font-size: 2em;
             }
         }
+
+        .comparison-box {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+        flex-wrap: wrap;
+    }
+    
+    .comparison-column {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 8px;
+        flex: 1;
+        min-width: 250px;
+        margin: 0 10px 10px 0;
+    }
+    
+    .amm-curve {
+        text-align: center;
+        margin: 30px 0;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    
+    .amm-caption {
+        font-style: italic;
+        color: #666;
+        margin-top: 15px;
+    }
+        
     </style>
 </head>
 <body>
@@ -322,10 +353,14 @@ NO price = YES shares / (YES shares + NO shares)
         </blockquote>
         
         <h2>The Mathematics of Market Making</h2>
-        
-        <p>For the mathematically inclined, here's how Polymarket's constant product AMM works:</p>
-        
-        <div class="code-block">
+
+<p>For the mathematically inclined, let's dive deep into how Polymarket's Automated Market Maker (AMM) works. Understanding this math will help you make smarter trades and avoid costly mistakes.</p>
+
+<h3>The Constant Product Formula</h3>
+
+<p>At the core of Polymarket's AMM is a simple yet powerful equation:</p>
+
+<div class="code-block">
 // Constant Product Market Maker (CPMM)
 // The product of shares remains constant: x * y = k
 
@@ -337,12 +372,251 @@ const newNoShares = k / newYesShares;
 
 // Price impact calculation
 const priceImpact = (newPrice - oldPrice) / oldPrice;
-        </div>
-        
-        <div class="warning-box">
-            <h4>⚠️ Important: Price Impact</h4>
-            <p>Large trades move prices significantly. Buying $10,000 worth of shares in a market with only $50,000 liquidity will dramatically shift the price, potentially resulting in poor execution.</p>
-        </div>
+</div>
+
+<p>This formula creates a hyperbolic curve that defines all possible combinations of YES and NO shares in the pool.</p>
+
+<div class="concept-box">
+    <h4>🔍 Key Insight: Automatic Price Discovery</h4>
+    <p>Prices are calculated directly from the ratio of shares in the pool:</p>
+    <code>YES price = NO shares / (YES shares + NO shares)</code><br>
+    <code>NO price = YES shares / (YES shares + NO shares)</code>
+    <p>These always add up to 1 (or 100%), aligning with probability theory: the sum of all outcome probabilities must equal 100%.</p>
+</div>
+
+<h3>Step-by-Step Trade Example</h3>
+
+<div class="example-box">
+    <h4>Initial Market State</h4>
+    <ul>
+        <li>YES shares in pool: 10,000</li>
+        <li>NO shares in pool: 6,000</li>
+        <li>Total shares: 16,000</li>
+        <li>Constant product k = 10,000 × 6,000 = 60,000,000</li>
+    </ul>
+    
+    <h4>Current Prices</h4>
+    <ul>
+        <li>YES price = 6,000 / 16,000 = 0.375 or $0.375</li>
+        <li>NO price = 10,000 / 16,000 = 0.625 or $0.625</li>
+    </ul>
+    <p>The market believes there's a 37.5% chance of the event happening.</p>
+    
+    <h4>Your Trade: Buying $1,000 of YES Shares</h4>
+    <ol>
+        <li>You want to buy $1,000 worth of YES shares at $0.375 per share.</li>
+        <li>Shares to receive: $1,000 / $0.375 = 2,666.67 YES shares</li>
+        <li>When you buy these shares, they come out of the pool:
+            <ul>
+                <li>New YES shares: 10,000 - 2,666.67 = 7,333.33</li>
+                <li>NO shares: 6,000 (unchanged, for now)</li>
+            </ul>
+        </li>
+        <li>This would break our constant product rule:
+            <ul>
+                <li>7,333.33 × 6,000 = 44,000,000 (not 60,000,000)</li>
+            </ul>
+        </li>
+        <li>So we adjust the NO shares to maintain the constant:
+            <ul>
+                <li>New NO shares = k / New YES shares</li>
+                <li>= 60,000,000 / 7,333.33 = 8,181.82</li>
+            </ul>
+        </li>
+        <li>This means adding 2,181.82 NO shares to the pool (8,181.82 - 6,000)</li>
+    </ol>
+    
+    <h4>New Market State After Your Trade</h4>
+    <ul>
+        <li>YES shares: 7,333.33</li>
+        <li>NO shares: 8,181.82</li>
+        <li>Total shares: 15,515.15</li>
+        <li>New prices:
+            <ul>
+                <li>YES price = 8,181.82 / 15,515.15 = 0.527 or $0.527</li>
+                <li>NO price = 7,333.33 / 15,515.15 = 0.473 or $0.473</li>
+            </ul>
+        </li>
+    </ul>
+    <p>Notice how the price of YES shares increased from $0.375 to $0.527 after your purchase! The market now believes there's a 52.7% chance of the event happening.</p>
+</div>
+
+<h3>Price Impact and Slippage</h3>
+
+<p>One crucial concept in AMMs is <strong>price impact</strong> - how much your trade moves the price. Large trades in smaller liquidity pools cause greater price impact.</p>
+
+<div class="code-block">
+// Price Impact Formula
+priceImpact = (finalPrice - initialPrice) / initialPrice
+
+// For our example above:
+initialYesPrice = 0.375
+finalYesPrice = 0.527
+priceImpact = (0.527 - 0.375) / 0.375 = 0.405 or 40.5%
+</div>
+
+<div class="warning-box">
+    <h4>⚠️ Important: Price Impact</h4>
+    <p>Large trades move prices significantly. In our example, a $1,000 trade pushed the price up by over 40%! Buying $10,000 worth of shares in a market with only $50,000 liquidity will dramatically shift the price, potentially resulting in very poor execution.</p>
+</div>
+
+<h3>How Pool Size Affects Price Impact</h3>
+
+<p>The size of the liquidity pool dramatically affects how much your trade moves the price.</p>
+
+<div class="comparison-box">
+    <div class="comparison-column">
+        <h4>Small Pool (Low Liquidity)</h4>
+        <ul>
+            <li>Initial: 1,000 YES shares, 600 NO shares</li>
+            <li>YES price = 0.375</li>
+            <li>Buy $1,000 of YES (2,666.67 shares)</li>
+            <li>New state: 733.33 YES, 818.18 NO</li>
+            <li>New YES price = 0.527</li>
+            <li><strong>Price Impact: 40.5%</strong></li>
+        </ul>
+    </div>
+    <div class="comparison-column">
+        <h4>Large Pool (High Liquidity)</h4>
+        <ul>
+            <li>Initial: 100,000 YES shares, 60,000 NO shares</li>
+            <li>YES price = 0.375</li>
+            <li>Buy $1,000 of YES (2,666.67 shares)</li>
+            <li>New state: 97,333.33 YES, 61,644.17 NO</li>
+            <li>New YES price = 0.388</li>
+            <li><strong>Price Impact: 3.5%</strong></li>
+        </ul>
+    </div>
+</div>
+
+<p>The exact same trade causes a much smaller price movement in the larger pool. This illustrates why liquidity is so important in prediction markets.</p>
+
+<h3>Optimal Trading Size</h3>
+
+<p>If you want to limit price impact, you need to calculate your optimal trade size.</p>
+
+<div class="example-box">
+    <h4>Calculating Maximum Trade Size for 5% Price Impact</h4>
+    <p>For our market with 10,000 YES shares and 6,000 NO shares (YES price = 0.375):</p>
+    <ol>
+        <li>Maximum final price = 0.375 × 1.05 = 0.39375</li>
+        <li>Using the pricing formula and constant product:</li>
+        <li>Solving the equations: x = 9,444.44 YES shares</li>
+        <li>Shares to buy: 10,000 - 9,444.44 = 555.56 YES shares</li>
+        <li>Cost: 555.56 × 0.375 = $208.33</li>
+    </ol>
+    <p>You should limit your trade to about $208 to keep the price impact under 5%.</p>
+</div>
+
+<h3>Arbitrage Opportunities</h3>
+
+<p>The mathematics of market making also creates opportunities for arbitrage between different prediction markets.</p>
+
+<div class="example-box">
+    <h4>Profitable Arbitrage Example</h4>
+    <p>Imagine two prediction markets for the same event:</p>
+    <ul>
+        <li>Platform A: YES at $0.48, NO at $0.52</li>
+        <li>Platform B: YES at $0.55, NO at $0.45</li>
+    </ul>
+    
+    <p>You can profit by:</p>
+    <ol>
+        <li>Buy $1,000 of NO shares on Platform A ($1,000 / $0.52 = 1,923.08 shares)</li>
+        <li>Buy $1,000 of YES shares on Platform B ($1,000 / $0.55 = 1,818.18 shares)</li>
+        <li>Total investment: $2,000</li>
+    </ol>
+    
+    <p>Regardless of the outcome:</p>
+    <ul>
+        <li>If YES happens: 1,818.18 shares × $1 = $1,818.18</li>
+        <li>If NO happens: 1,923.08 shares × $1 = $1,923.08</li>
+        <li>Minimum guaranteed return: $1,818.18</li>
+        <li>Your cost: $2,000</li>
+        <li>Profit/loss: -$181.82</li>
+    </ul>
+    
+    <p>But wait! Shouldn't there be arbitrage here? The key insight is:</p>
+    <p>We need the sum of the lowest prices to be less than 1.0 for risk-free profit:</p>
+    <code>$0.48 + $0.45 = $0.93 &lt; $1.00</code>
+    
+    <p>For this actual example, if we bet $1,000 on both sides:</p>
+    <ul>
+        <li>NO shares on Platform A: 1,923.08</li>
+        <li>YES shares on Platform B: 1,818.18</li>
+        <li>Total cost: $2,000</li>
+        <li>For either outcome, minimum payout: $1,818.18</li>
+        <li>This means: -$181.82 loss</li>
+    </ul>
+    
+    <p>But if we adjust our bet amounts proportionally:</p>
+    <ul>
+        <li>Bet $1,000 on Platform A NO shares: 1,923.08 shares</li>
+        <li>Bet $1,058 on Platform B YES shares: 1,923.64 shares</li>
+        <li>Total cost: $2,058</li>
+        <li>Either outcome pays: ~$1,923</li>
+        <li>Result: -$135 loss</li>
+    </ul>
+    
+    <p>To find true arbitrage, look for markets where:
+    <br><code>Lowest YES price + Lowest NO price &lt; 1.0</code></p>
+</div>
+
+<h3>Impermanent Loss for Liquidity Providers</h3>
+
+<p>Liquidity providers (people who deposit funds into the market) face a phenomenon called "impermanent loss" when prices move significantly.</p>
+
+<div class="example-box">
+    <h4>Liquidity Provider Example</h4>
+    <ol>
+        <li>Initial deposit: $1,000 worth of YES ($500) and NO ($500) shares
+            <ul>
+                <li>At $0.50 each: 1,000 YES and 1,000 NO shares</li>
+            </ul>
+        </li>
+        <li>After trading, prices move to YES: $0.75, NO: $0.25
+            <ul>
+                <li>New pool state: 577.35 YES, 1,732.05 NO shares</li>
+            </ul>
+        </li>
+        <li>LP's share value:
+            <ul>
+                <li>YES shares: 577.35 × $0.75 = $433.01</li>
+                <li>NO shares: 1,732.05 × $0.25 = $433.01</li>
+                <li>Total: $866.02</li>
+            </ul>
+        </li>
+        <li>If they had held instead:
+            <ul>
+                <li>YES: 1,000 × $0.75 = $750</li>
+                <li>NO: 1,000 × $0.25 = $250</li>
+                <li>Total: $1,000</li>
+            </ul>
+        </li>
+        <li>Impermanent loss: $866.02 - $1,000 = -$133.98 (13.4%)</li>
+    </ol>
+    <p>This is why liquidity providers typically earn fees from trades, to offset this risk.</p>
+</div>
+
+<h3>Visualizing the AMM Curve</h3>
+
+<div class="amm-curve">
+    <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjAwIDQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxzdHlsZT4KICAgICAgICAuYXhpcyB7IHN0cm9rZTogIzMzMzsgc3Ryb2tlLXdpZHRoOiAyOyB9CiAgICAgICAgLmxhYmVsIHsgZm9udC1mYW1pbHk6IHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTJweDsgfQogICAgICAgIC5jdXJ2ZSB7IGZpbGw6IG5vbmU7IHN0cm9rZTogIzNmNTFiNTsgc3Ryb2tlLXdpZHRoOiAzOyB9CiAgICAgICAgLnBvaW50IHsgZmlsbDogI2Y0NDMzNjsgfQogICAgICAgIC5wb2ludDIgeyBmaWxsOiAjNGNhZjUwOyB9CiAgICAgICAgLmFycm93IHsgZmlsbDogbm9uZTsgc3Ryb2tlOiAjZjQ0MzM2OyBzdHJva2Utd2lkdGg6IDI7IHN0cm9rZS1kYXNoYXJyYXk6IDU7IH0KICAgIDwvc3R5bGU+CiAgICA8IS0tIFktYXhpcyAoWUVTIHNoYXJlcykgLS0+CiAgICA8bGluZSBjbGFzcz0iYXhpcyIgeDE9IjUwIiB5MT0iNTAiIHgyPSI1MCIgeTI9IjM1MCIgLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTAsNDAgNDUsNTAgNTUsNTAiIGZpbGw9IiMzMzMiIC8+CiAgICA8IS0tIFgtYXhpcyAoTk8gc2hhcmVzKSAtLT4KICAgIDxsaW5lIGNsYXNzPSJheGlzIiB4MT0iNTAiIHkxPSIzNTAiIHgyPSI1NTAiIHkyPSIzNTAiIC8+CiAgICA8cG9seWdvbiBwb2ludHM9IjU2MCwzNTAgNTUwLDM0NSA1NTAsMzU1IiBmaWxsPSIjMzMzIiAvPgogICAgCiAgICA8IS0tIEF4aXMgbGFiZWxzIC0tPgogICAgPHRleHQgY2xhc3M9ImxhYmVsIiB4PSIzMDAiIHk9IjM4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tk8gU2hhcmVzPC90ZXh0PgogICAgPHRleHQgY2xhc3M9ImxhYmVsIiB4PSIyMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB0cmFuc2Zvcm09InJvdGF0ZSgtOTAgMjAgMjAwKSI+WUVTIFNoYXJlczwvdGV4dD4KICAgIAogICAgPCEtLSBUSGUgY29uc3RhbnQgcHJvZHVjdCBjdXJ2ZSB4KnkgPSBrIC0tPgogICAgPHBhdGggY2xhc3M9ImN1cnZlIiBkPSJNIDEwMCwzMDAgTCAxMjAsMjUwIEwgMTUwLDIwMCBMIDIwMCwxNTAgTCAyNTAsMTIwIEwgMzAwLDEwMCBMIDM1MCw4NSBMIDQ1MCw2NSBMIDUwMCw2MCIgLz4KICAgIAogICAgPCEtLSBQb2ludHMgb24gdGhlIGN1cnZlIC0tPgogICAgPGNpcmNsZSBjbGFzcz0icG9pbnQiIGN4PSIzMDAiIGN5PSIxMDAiIHI9IjgiIC8+CiAgICA8Y2lyY2xlIGNsYXNzPSJwb2ludDIiIGN4PSIyMDAiIGN5PSIxNTAiIHI9IjgiIC8+CiAgICAKICAgIDwhLS0gQXJyb3cgc2hvd2luZyBhIHRyYWRlIC0tPgogICAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDMwMCwxMDAgTCAyMDAsMTUwIiAvPgogICAgCiAgICA8IS0tIFBvaW50IGxhYmVscyAtLT4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzEwIiB5PSI5MCIgdGV4dC1hbmNob3I9ImxlZnQiPkJlZm9yZSBUcmFkZSAoMTAwMDAgWUVTLCA2MDAwIE5PKTwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMTUwIiB5PSIxNTAiIHRleHQtYW5jaG9yPSJyaWdodCI+QWZ0ZXIgVHJhZGUgKDczMzMgWUVTLCA4MTgyIE5PKTwvdGV4dD4KICAgIAogICAgPCEtLSBBeGlzIGxhYmVscyAtLT4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iNTAiIHk9IjM3MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MDwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzAwIiB5PSIzNzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjYwMDA8L3RleHQ+CiAgICA8dGV4dCBjbGFzcz0ibGFiZWwiIHg9IjUwMCIgeT0iMzcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4xMDAwMDwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzAiIHk9IjM1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MDwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzAiIHk9IjIwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+NTAwMDwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzAiIHk9IjEwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MTAwMDA8L3RleHQ+Cjwvc3ZnPg==" alt="AMM Curve Visualization" style="max-width:100%; height:auto;">
+    <p class="amm-caption">The constant product curve: Any point on this curve represents a valid pool state. Trades move us along this curve, and the slope at any point determines the price.</p>
+</div>
+
+<h3>Why This Mathematics Matters</h3>
+
+<div class="concept-box">
+    <p>Understanding the market making mathematics in Polymarket helps you:</p>
+    <ul>
+        <li><strong>Estimate price impact</strong> before making large trades</li>
+        <li><strong>Optimize trade sizing</strong> to minimize slippage</li>
+        <li><strong>Identify arbitrage opportunities</strong> across different prediction markets</li>
+        <li><strong>Understand risks</strong> when providing liquidity</li>
+    </ul>
+    <p>The elegance of this system is that it works entirely through smart contracts - no centralized market maker is needed!</p>
+</div>
         
         <h2>Why Prediction Markets Matter</h2>
         
