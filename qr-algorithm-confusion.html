@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The QR Algorithm: Why It Confuses the Hell Out of Me | Prateek Chandra Jha</title>
+    
+    <!-- MathJax for LaTeX equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+    
+    <!-- Plotly for interactive visualizations -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    <!-- Math.js for matrix calculations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        article {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 40px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        .date {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+        .confession {
+            background-color: #fff4e0;
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .insight {
+            background-color: #e8f6ff;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .interactive-demo {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .code {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .matrix-display {
+            font-family: 'Courier New', monospace;
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+        }
+        .back-link {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .back-link a {
+            color: #3498db;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="back-link">
+        <a href="index.html">← Back to Home</a>
+    </div>
+    
+    <article>
+        <h1>The QR Algorithm: Why It Confuses the Hell Out of Me</h1>
+        <div class="date">February 2025</div>
+        
+        <div class="confession">
+            <strong>A Confession:</strong> I've been studying numerical linear algebra for years, implemented countless algorithms, and yet the QR algorithm still manages to make my brain do backflips. It's simultaneously one of the most elegant and mind-bending algorithms I've encountered.
+        </div>
+        
+        <p>The QR algorithm is the crown jewel of eigenvalue computation. It's what powers <code>numpy.linalg.eig()</code>, MATLAB's <code>eig()</code>, and pretty much every serious linear algebra package out there. Yet, every time I try to truly understand why it works, I feel like I'm chasing smoke.</p>
+        
+        <h2>What the Hell is the QR Algorithm?</h2>
+        
+        <p>At its core, the QR algorithm is deceptively simple. Given a matrix \(A\), we want to find its eigenvalues. The algorithm goes like this:</p>
+        
+        <ol>
+            <li>Start with your matrix \(A_0 = A\)</li>
+            <li>Decompose \(A_k = Q_k R_k\) where \(Q_k\) is orthogonal and \(R_k\) is upper triangular</li>
+            <li>Form \(A_{k+1} = R_k Q_k\) (yes, we flip the order!)</li>
+            <li>Repeat until \(A_k\) converges to something nice</li>
+        </ol>
+        
+        <p>And here's where my brain starts melting: <em>why does flipping the order of multiplication make the eigenvalues appear on the diagonal?</em></p>
+        
+        <div class="insight">
+            <strong>The Key Insight:</strong> Each iteration performs a similarity transformation: \(A_{k+1} = R_k Q_k = Q_k^T A_k Q_k\). This preserves eigenvalues while (hopefully) revealing them on the diagonal.
+        </div>
+        
+        <h2>Let's See It in Action</h2>
+        
+        <div class="interactive-demo">
+            <h3>Interactive QR Algorithm Demo</h3>
+            <p>Watch how a matrix transforms through QR iterations:</p>
+            
+            <div id="matrix-input">
+                <p>Initial Matrix:</p>
+                <div class="matrix-display" id="initial-matrix"></div>
+            </div>
+            
+            <button class="button" onclick="runQRIteration()">Run One Iteration</button>
+            <button class="button" onclick="runMultipleIterations()">Run 10 Iterations</button>
+            <button class="button" onclick="resetDemo()">Reset</button>
+            
+            <div id="current-matrix">
+                <p>Current Matrix (Iteration <span id="iteration-count">0</span>):</p>
+                <div class="matrix-display" id="current-matrix-display"></div>
+            </div>
+            
+            <div id="eigenvalue-convergence"></div>
+        </div>
+        
+        <h2>The Mathematical Magic</h2>
+        
+        <p>The QR decomposition factors a matrix \(A = QR\) where:</p>
+        <ul>
+            <li>\(Q\) is orthogonal (\(Q^T Q = I\))</li>
+            <li>\(R\) is upper triangular</li>
+        </ul>
+        
+        <p>When we compute \(A_{k+1} = R_k Q_k\), something beautiful happens:</p>
+        
+        <div style="overflow-x: auto;">
+            $$A_{k+1} = R_k Q_k = Q_k^T A_k Q_k$$
+        </div>
+        
+        <p>This is a similarity transformation! And similarity transformations preserve eigenvalues. But why does this make eigenvalues appear on the diagonal?</p>
+        
+        <div class="confession">
+            <strong>Here's What Confuses Me:</strong> The connection between QR decomposition and eigenvalue revelation feels like mathematical voodoo. I understand each step individually, but the emergent behavior – that's where my intuition breaks down.
+        </div>
+        
+        <h2>The Connection to Power Iteration</h2>
+        
+        <p>One way to understand the QR algorithm is through its connection to power iteration. If we apply the QR algorithm to a matrix \(A\), we're essentially performing simultaneous power iteration on all eigenvectors.</p>
+        
+        <p>Consider what happens when we compute \(A^k\) using repeated QR decompositions:</p>
+        
+        $$A^k = (Q_1 R_1)(Q_2 R_2)...(Q_k R_k) = Q_1 Q_2 ... Q_k \cdot R_k ... R_2 R_1$$
+        
+        <p>The product of orthogonal matrices is orthogonal, and the product of upper triangular matrices is upper triangular. So we get a QR decomposition of \(A^k\)!</p>
+        
+        <h2>Why It Works So Well in Practice</h2>
+        
+        <p>Modern implementations don't use the "pure" QR algorithm. They use tricks that make my head spin even more:</p>
+        
+        <h3>1. Hessenberg Reduction</h3>
+        <p>Before running QR iterations, smart implementations first reduce the matrix to Hessenberg form (almost triangular). This makes each QR step \(O(n^2)\) instead of \(O(n^3)\).</p>
+        
+        <h3>2. Shifts</h3>
+        <p>Instead of decomposing \(A_k\), we decompose \(A_k - \sigma_k I\) for carefully chosen shifts \(\sigma_k\). This dramatically improves convergence. The Wilkinson shift is particularly clever:</p>
+        
+        $$\sigma = a_{nn} - \frac{sign(\delta) b_{n,n-1}^2}{|\delta| + \sqrt{\delta^2 + b_{n,n-1}^2}}$$
+        
+        <p>where \(\delta = (a_{n-1,n-1} - a_{nn})/2\).</p>
+        
+        <div class="confession">
+            <strong>Another Confession:</strong> I've stared at the Wilkinson shift formula for hours. I can verify it works beautifully in practice, but the intuition behind it? Still escapes me.
+        </div>
+        
+        <h3>3. Deflation</h3>
+        <p>Once we've found an eigenvalue (when a subdiagonal element becomes tiny), we can "deflate" the matrix and work on a smaller problem. It's like peeling an onion, layer by layer.</p>
+        
+        <h2>The Implementation Gap</h2>
+        
+        <p>Here's a simple Python implementation that captures the essence:</p>
+        
+        <pre class="code">
+import numpy as np
+
+def qr_algorithm_simple(A, max_iters=100, tol=1e-10):
+    n = A.shape[0]
+    A_k = A.copy()
+    
+    for k in range(max_iters):
+        # QR decomposition
+        Q, R = np.linalg.qr(A_k)
+        
+        # Form next iterate
+        A_k = R @ Q
+        
+        # Check for convergence (off-diagonal elements small)
+        off_diag = np.abs(A_k[np.triu_indices(n, k=1)])
+        if np.max(off_diag) < tol:
+            break
+    
+    return np.diag(A_k)  # Return eigenvalues
+        </pre>
+        
+        <p>But compare this to what's actually in LAPACK (the library NumPy uses), and you'll find thousands of lines of Fortran with optimizations that would make your head spin.</p>
+        
+        <h2>My Ongoing Confusion</h2>
+        
+        <p>Here are the questions that still haunt me:</p>
+        
+        <ol>
+            <li><strong>Why QR specifically?</strong> Why not LU? Why not some other decomposition? What makes QR special for eigenvalues?</li>
+            <li><strong>The shift strategies:</strong> How did anyone figure out the Wilkinson shift? It seems to come from thin air.</li>
+            <li><strong>Convergence rates:</strong> The theoretical analysis involves Wilkinson matrices and careful perturbation theory. Every time I dive into it, I emerge more confused.</li>
+        </ol>
+        
+        <div class="insight">
+            <strong>A Moment of Clarity:</strong> Perhaps my confusion stems from expecting a simple, intuitive explanation for something that emerges from deep mathematical structures. The QR algorithm sits at the intersection of geometry (orthogonal transformations), algebra (eigenvalues), and analysis (convergence theory).
+        </div>
+        
+        <h2>Why I Love It Despite the Confusion</h2>
+        
+        <p>The QR algorithm embodies everything beautiful about numerical linear algebra:</p>
+        
+        <ul>
+            <li>It's theoretically elegant yet practically messy</li>
+            <li>Simple to state, deep to understand</li>
+            <li>Connects disparate areas of mathematics</li>
+            <li>Powers tools we use every day without thinking twice</li>
+        </ul>
+        
+        <p>Every time I call <code>np.linalg.eig()</code>, I'm invoking this beautiful, confusing algorithm. It's like using a smartphone – I know it works, I roughly understand the principles, but the full depth of "why" remains tantalizingly out of reach.</p>
+        
+        <h2>Resources for Fellow Confused Souls</h2>
+        
+        <p>If you're also fascinated by the QR algorithm, here are resources that have helped (and confused) me:</p>
+        
+        <ul>
+            <li>Trefethen & Bau's "Numerical Linear Algebra" – Chapter 28-29</li>
+            <li>Watkins' "The Matrix Eigenvalue Problem" – The definitive reference</li>
+            <li>Stewart's "Matrix Algorithms" – Practical implementation details</li>
+            <li>Parlett's "The Symmetric Eigenvalue Problem" – For the symmetric case</li>
+        </ul>
+        
+        <div class="confession">
+            <strong>Final Confession:</strong> Writing this post hasn't resolved my confusion – it's crystallized it. The QR algorithm remains a beautiful mystery, a reminder that even in mathematics, some things are easier to use than to fully understand.
+        </div>
+        
+        <p>Maybe that's okay. Maybe the confusion is part of the beauty.</p>
+        
+    </article>
+    
+    <footer>
+        <p>&copy; 2025 Prateek Chandra Jha. All rights reserved.</p>
+        <p><a href="index.html">Back to Home</a></p>
+    </footer>
+    
+    <script>
+        // Interactive demo code
+        let currentMatrix = [[4, 1, 2], [1, 3, 1], [2, 1, 5]];
+        let iterationCount = 0;
+        
+        function displayMatrix(matrix, elementId) {
+            const element = document.getElementById(elementId);
+            let html = '<pre>';
+            for (let i = 0; i < matrix.length; i++) {
+                html += '[ ';
+                for (let j = 0; j < matrix[i].length; j++) {
+                    html += matrix[i][j].toFixed(4).padStart(8) + ' ';
+                }
+                html += ']\n';
+            }
+            html += '</pre>';
+            element.innerHTML = html;
+        }
+        
+        function qrDecomposition(A) {
+            // Simple Gram-Schmidt QR decomposition
+            const m = math.matrix(A);
+            const qr = math.qr(m);
+            return {
+                Q: qr.Q.toArray(),
+                R: qr.R.toArray()
+            };
+        }
+        
+        function matrixMultiply(A, B) {
+            return math.multiply(math.matrix(A), math.matrix(B)).toArray();
+        }
+        
+        function runQRIteration() {
+            const qr = qrDecomposition(currentMatrix);
+            currentMatrix = matrixMultiply(qr.R, qr.Q);
+            iterationCount++;
+            
+            displayMatrix(currentMatrix, 'current-matrix-display');
+            document.getElementById('iteration-count').textContent = iterationCount;
+            
+            // Show eigenvalue convergence
+            plotEigenvalueConvergence();
+        }
+        
+        function runMultipleIterations() {
+            for (let i = 0; i < 10; i++) {
+                runQRIteration();
+            }
+        }
+        
+        function resetDemo() {
+            currentMatrix = [[4, 1, 2], [1, 3, 1], [2, 1, 5]];
+            iterationCount = 0;
+            displayMatrix(currentMatrix, 'current-matrix-display');
+            document.getElementById('iteration-count').textContent = iterationCount;
+            document.getElementById('eigenvalue-convergence').innerHTML = '';
+        }
+        
+        function plotEigenvalueConvergence() {
+            // Extract diagonal elements (approximating eigenvalues)
+            const diagonal = [];
+            for (let i = 0; i < currentMatrix.length; i++) {
+                diagonal.push(currentMatrix[i][i]);
+            }
+            
+            // Create a simple bar chart of diagonal elements
+            const trace = {
+                x: ['λ₁', 'λ₂', 'λ₃'],
+                y: diagonal,
+                type: 'bar',
+                marker: {
+                    color: ['#3498db', '#2ecc71', '#e74c3c']
+                }
+            };
+            
+            const layout = {
+                title: 'Diagonal Elements (Approximate Eigenvalues)',
+                yaxis: { title: 'Value' },
+                height: 300,
+                margin: { t: 40, b: 40, l: 40, r: 40 }
+            };
+            
+            Plotly.newPlot('eigenvalue-convergence', [trace], layout);
+        }
+        
+        // Initialize display
+        displayMatrix(currentMatrix, 'initial-matrix');
+        displayMatrix(currentMatrix, 'current-matrix-display');
+    </script>
+</body>
+</html>
