@@ -188,20 +188,6 @@
         <div class="confession">
             <strong>Here's What Confuses Me:</strong> The connection between QR decomposition and eigenvalue revelation feels like mathematical voodoo. I understand each step individually, but the emergent behavior – that's where my intuition breaks down.
         </div>
-        
-        <h2>The Connection to Power Iteration</h2>
-        
-        <p>One way to understand the QR algorithm is through its connection to power iteration. If we apply the QR algorithm to a matrix \(A\), we're essentially performing simultaneous power iteration on all eigenvectors.</p>
-        
-        <p>Consider what happens when we compute \(A^k\) using repeated QR decompositions:</p>
-        
-        $$A^k = (Q_1 R_1)(Q_2 R_2)...(Q_k R_k) = Q_1 Q_2 ... Q_k \cdot R_k ... R_2 R_1$$
-        
-        <p>The product of orthogonal matrices is orthogonal, and the product of upper triangular matrices is upper triangular. So we get a QR decomposition of \(A^k\)!</p>
-        
-        <h2>Why It Works So Well in Practice</h2>
-        
-        <p>Modern implementations don't use the "pure" QR algorithm. They use tricks that make my head spin even more:</p>
 
         <h2>The Connection to Power Iteration</h2>
 
@@ -333,6 +319,10 @@ $$A^k = \bar{Q}_k \bar{R}_k$$
 </ol>
 
 <p>But perhaps that's the beauty of it – a simple iteration that connects power methods, orthogonalization, and eigenvalue computation in one elegant package.</p>
+
+        <h2>Why It Works So Well in Practice</h2>
+        
+        <p>Modern implementations don't use the "pure" QR algorithm. They use tricks that make my head spin even more:</p>
         
         <h3>1. Hessenberg Reduction</h3>
         <p>Before running QR iterations, smart implementations first reduce the matrix to Hessenberg form (almost triangular). This makes each QR step \(O(n^2)\) instead of \(O(n^3)\).</p>
