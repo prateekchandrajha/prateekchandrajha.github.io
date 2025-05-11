@@ -202,6 +202,137 @@
         <h2>Why It Works So Well in Practice</h2>
         
         <p>Modern implementations don't use the "pure" QR algorithm. They use tricks that make my head spin even more:</p>
+
+        <h2>The Connection to Power Iteration</h2>
+
+<p>One of the most beautiful insights about the QR algorithm is its deep connection to power iteration. This connection helps explain why the QR algorithm converges to eigenvalues. Let's build this understanding step by step.</p>
+
+<h3>Quick Refresher: Power Iteration</h3>
+
+<p>Power iteration finds the dominant eigenvector of a matrix. Given a matrix \(A\) and a starting vector \(v_0\):</p>
+
+<ol>
+    <li>Compute \(v_1 = A v_0\)</li>
+    <li>Normalize: \(\hat{v}_1 = v_1 / \|v_1\|\)</li>
+    <li>Repeat: \(v_{k+1} = A v_k\), \(\hat{v}_{k+1} = v_{k+1} / \|v_{k+1}\|\)</li>
+</ol>
+
+<p>After many iterations, \(\hat{v}_k\) converges to the eigenvector corresponding to the largest eigenvalue (in magnitude).</p>
+
+<h3>The Key Insight: QR Algorithm as Simultaneous Power Iteration</h3>
+
+<p>Here's the mind-blowing realization: the QR algorithm is essentially performing power iteration on <em>all columns of the identity matrix simultaneously</em>. Let me show you how.</p>
+
+<h4>Step 1: Start with the Identity Matrix</h4>
+
+<p>Consider starting with the columns of the identity matrix:</p>
+$$I = [e_1 | e_2 | ... | e_n]$$
+
+<h4>Step 2: Apply Power Iteration to Each Column</h4>
+
+<p>After \(k\) iterations of power iteration on each column, we get:</p>
+$$[A^k e_1 | A^k e_2 | ... | A^k e_n] = A^k I = A^k$$
+
+<h4>Step 3: The QR Decomposition Connection</h4>
+
+<p>Now here's where it gets interesting. Let's trace what happens in the QR algorithm:</p>
+
+<p>Start with \(A_0 = A\). After one iteration:</p>
+$$A_0 = Q_1 R_1$$
+$$A_1 = R_1 Q_1 = Q_1^T A_0 Q_1$$
+
+<p>After two iterations:</p>
+$$A_1 = Q_2 R_2$$
+$$A_2 = R_2 Q_2 = Q_2^T A_1 Q_2 = Q_2^T Q_1^T A_0 Q_1 Q_2$$
+
+<p>After \(k\) iterations:</p>
+$$A_k = (Q_k Q_{k-1} ... Q_1)^T A_0 (Q_1 Q_2 ... Q_k)$$
+
+<p>Let's define \(\bar{Q}_k = Q_1 Q_2 ... Q_k\). Then:</p>
+$$A_k = \bar{Q}_k^T A_0 \bar{Q}_k$$
+
+<h4>Step 4: The Power Connection</h4>
+
+<p>Here's the crucial observation. Consider computing \(A^k\) using QR decompositions:</p>
+$$A = Q_1 R_1$$
+$$A^2 = A \cdot A = Q_1 R_1 Q_1 R_1$$
+
+<p>But wait! We can't just multiply these together naively. We need to be clever. Let's factor:</p>
+$$A^2 = Q_1 (R_1 Q_1) R_1 = Q_1 A_1 R_1$$
+
+<p>Now compute the QR decomposition of \(A_1\):</p>
+$$A_1 = Q_2 R_2$$
+
+<p>So:</p>
+$$A^2 = Q_1 Q_2 R_2 R_1$$
+
+<p>Continuing this pattern:</p>
+$$A^3 = A^2 \cdot A = (Q_1 Q_2 R_2 R_1)(Q_1 R_1) = Q_1 Q_2 (R_2 R_1 Q_1) R_1$$
+
+<p>And we can show by induction that:</p>
+$$A^k = (Q_1 Q_2 ... Q_k)(R_k R_{k-1} ... R_1) = \bar{Q}_k \bar{R}_k$$
+
+<h4>Step 5: The QR Decomposition of \(A^k\)</h4>
+
+<p>What we've just shown is remarkable: the QR algorithm implicitly computes the QR decomposition of \(A^k\)!</p>
+
+<p>The matrix \(\bar{Q}_k = Q_1 Q_2 ... Q_k\) contains the orthonormalized columns of \(A^k\). In other words, the columns of \(\bar{Q}_k\) are the results of applying power iteration (with orthogonalization) to the columns of the identity matrix.</p>
+
+<h4>Step 6: Why This Leads to Eigenvalues</h4>
+
+<p>As \(k \to \infty\), the columns of \(A^k\) align with the dominant eigenvectors of \(A\). The QR decomposition orthogonalizes these vectors, and the similarity transformation \(A_k = \bar{Q}_k^T A \bar{Q}_k\) reveals the eigenvalues.</p>
+
+<p>For a diagonalizable matrix \(A = V \Lambda V^{-1}\), where \(\Lambda\) contains eigenvalues in decreasing order of magnitude:</p>
+
+$$A^k = V \Lambda^k V^{-1}$$
+
+<p>The columns of \(V \Lambda^k\) become increasingly dominated by the eigenvectors corresponding to larger eigenvalues. The QR process extracts these dominant directions.</p>
+
+<h3>A Concrete Example</h3>
+
+<p>Let's see this with a 2×2 matrix. Suppose:</p>
+$$A = \begin{bmatrix} 3 & 1 \\ 1 & 2 \end{bmatrix}$$
+
+<p>with eigenvalues \(\lambda_1 \approx 3.618\) and \(\lambda_2 \approx 1.382\).</p>
+
+<p>Computing \(A^k\) for large \(k\):</p>
+$$A^k \approx \lambda_1^k v_1 w_1^T + \lambda_2^k v_2 w_2^T$$
+
+<p>where \(v_i\) are right eigenvectors and \(w_i\) are left eigenvectors.</p>
+
+<p>As \(k\) grows, the first term dominates (since \(|\lambda_1| > |\lambda_2|\)), and the QR decomposition of \(A^k\) reveals this structure:</p>
+$$A^k = \bar{Q}_k \bar{R}_k$$
+
+<p>The first column of \(\bar{Q}_k\) approaches \(v_1\), and the similarity transformation \(\bar{Q}_k^T A \bar{Q}_k\) approaches an upper triangular matrix with eigenvalues on the diagonal.</p>
+
+<h3>The Subspace Iteration Interpretation</h3>
+
+<p>More generally, we can view the QR algorithm as performing <em>subspace iteration</em>:</p>
+
+<ol>
+    <li>Start with the entire space \(\mathbb{R}^n\) (represented by \(I\))</li>
+    <li>Apply \(A\) repeatedly: \(A^k I = A^k\)</li>
+    <li>Orthogonalize the resulting vectors (QR decomposition)</li>
+    <li>The orthogonalized vectors converge to invariant subspaces</li>
+</ol>
+
+<p>This explains why the QR algorithm finds <em>all</em> eigenvalues simultaneously – it's performing power iteration on the entire space at once!</p>
+
+<div class="insight">
+    <strong>The Deep Connection:</strong> The QR algorithm is simultaneous power iteration with continuous orthogonalization. This orthogonalization prevents numerical instability and reveals all eigenvalues, not just the dominant one.
+</div>
+
+<h3>Why This Still Confuses Me</h3>
+
+<p>Even with this understanding, several aspects remain mysterious:</p>
+
+<ol>
+    <li>The <em>rate</em> of convergence depends on eigenvalue ratios in complex ways</li>
+    <li>The connection works perfectly for symmetric matrices but gets subtle for non-symmetric ones</li>
+    <li>The shifts in practical QR algorithms add another layer of complexity to this interpretation</li>
+</ol>
+
+<p>But perhaps that's the beauty of it – a simple iteration that connects power methods, orthogonalization, and eigenvalue computation in one elegant package.</p>
         
         <h3>1. Hessenberg Reduction</h3>
         <p>Before running QR iterations, smart implementations first reduce the matrix to Hessenberg form (almost triangular). This makes each QR step \(O(n^2)\) instead of \(O(n^3)\).</p>
