@@ -600,26 +600,6 @@ priceImpact = (0.527 - 0.375) / 0.375 = 0.405 or 40.5%
     <p>This is why liquidity providers typically earn fees from trades, to offset this risk.</p>
 </div>
 
-<h3>Visualizing the AMM Curve</h3>
-
-<div class="amm-curve">
-    <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjAwIDQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxzdHlsZT4KICAgICAgICAuYXhpcyB7IHN0cm9rZTogIzMzMzsgc3Ryb2tlLXdpZHRoOiAyOyB9CiAgICAgICAgLmxhYmVsIHsgZm9udC1mYW1pbHk6IHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTJweDsgfQogICAgICAgIC5jdXJ2ZSB7IGZpbGw6IG5vbmU7IHN0cm9rZTogIzNmNTFiNTsgc3Ryb2tlLXdpZHRoOiAzOyB9CiAgICAgICAgLnBvaW50IHsgZmlsbDogI2Y0NDMzNjsgfQogICAgICAgIC5wb2ludDIgeyBmaWxsOiAjNGNhZjUwOyB9CiAgICAgICAgLmFycm93IHsgZmlsbDogbm9uZTsgc3Ryb2tlOiAjZjQ0MzM2OyBzdHJva2Utd2lkdGg6IDI7IHN0cm9rZS1kYXNoYXJyYXk6IDU7IH0KICAgIDwvc3R5bGU+CiAgICA8IS0tIFktYXhpcyAoWUVTIHNoYXJlcykgLS0+CiAgICA8bGluZSBjbGFzcz0iYXhpcyIgeDE9IjUwIiB5MT0iNTAiIHgyPSI1MCIgeTI9IjM1MCIgLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTAsNDAgNDUsNTAgNTUsNTAiIGZpbGw9IiMzMzMiIC8+CiAgICA8IS0tIFgtYXhpcyAoTk8gc2hhcmVzKSAtLT4KICAgIDxsaW5lIGNsYXNzPSJheGlzIiB4MT0iNTAiIHkxPSIzNTAiIHgyPSI1NTAiIHkyPSIzNTAiIC8+CiAgICA8cG9seWdvbiBwb2ludHM9IjU2MCwzNTAgNTUwLDM0NSA1NTAsMzU1IiBmaWxsPSIjMzMzIiAvPgogICAgCiAgICA8IS0tIEF4aXMgbGFiZWxzIC0tPgogICAgPHRleHQgY2xhc3M9ImxhYmVsIiB4PSIzMDAiIHk9IjM4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tk8gU2hhcmVzPC90ZXh0PgogICAgPHRleHQgY2xhc3M9ImxhYmVsIiB4PSIyMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB0cmFuc2Zvcm09InJvdGF0ZSgtOTAgMjAgMjAwKSI+WUVTIFNoYXJlczwvdGV4dD4KICAgIAogICAgPCEtLSBUSGUgY29uc3RhbnQgcHJvZHVjdCBjdXJ2ZSB4KnkgPSBrIC0tPgogICAgPHBhdGggY2xhc3M9ImN1cnZlIiBkPSJNIDEwMCwzMDAgTCAxMjAsMjUwIEwgMTUwLDIwMCBMIDIwMCwxNTAgTCAyNTAsMTIwIEwgMzAwLDEwMCBMIDM1MCw4NSBMIDQ1MCw2NSBMIDUwMCw2MCIgLz4KICAgIAogICAgPCEtLSBQb2ludHMgb24gdGhlIGN1cnZlIC0tPgogICAgPGNpcmNsZSBjbGFzcz0icG9pbnQiIGN4PSIzMDAiIGN5PSIxMDAiIHI9IjgiIC8+CiAgICA8Y2lyY2xlIGNsYXNzPSJwb2ludDIiIGN4PSIyMDAiIGN5PSIxNTAiIHI9IjgiIC8+CiAgICAKICAgIDwhLS0gQXJyb3cgc2hvd2luZyBhIHRyYWRlIC0tPgogICAgPHBhdGggY2xhc3M9ImFycm93IiBkPSJNIDMwMCwxMDAgTCAyMDAsMTUwIiAvPgogICAgCiAgICA8IS0tIFBvaW50IGxhYmVscyAtLT4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzEwIiB5PSI5MCIgdGV4dC1hbmNob3I9ImxlZnQiPkJlZm9yZSBUcmFkZSAoMTAwMDAgWUVTLCA2MDAwIE5PKTwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMTUwIiB5PSIxNTAiIHRleHQtYW5jaG9yPSJyaWdodCI+QWZ0ZXIgVHJhZGUgKDczMzMgWUVTLCA4MTgyIE5PKTwvdGV4dD4KICAgIAogICAgPCEtLSBBeGlzIGxhYmVscyAtLT4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iNTAiIHk9IjM3MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MDwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzAwIiB5PSIzNzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjYwMDA8L3RleHQ+CiAgICA8dGV4dCBjbGFzcz0ibGFiZWwiIHg9IjUwMCIgeT0iMzcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4xMDAwMDwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzAiIHk9IjM1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MDwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzAiIHk9IjIwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+NTAwMDwvdGV4dD4KICAgIDx0ZXh0IGNsYXNzPSJsYWJlbCIgeD0iMzAiIHk9IjEwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MTAwMDA8L3RleHQ+Cjwvc3ZnPg==" alt="AMM Curve Visualization" style="max-width:100%; height:auto;">
-    <p class="amm-caption">The constant product curve: Any point on this curve represents a valid pool state. Trades move us along this curve, and the slope at any point determines the price.</p>
-</div>
-
-<h3>Why This Mathematics Matters</h3>
-
-<div class="concept-box">
-    <p>Understanding the market making mathematics in Polymarket helps you:</p>
-    <ul>
-        <li><strong>Estimate price impact</strong> before making large trades</li>
-        <li><strong>Optimize trade sizing</strong> to minimize slippage</li>
-        <li><strong>Identify arbitrage opportunities</strong> across different prediction markets</li>
-        <li><strong>Understand risks</strong> when providing liquidity</li>
-    </ul>
-    <p>The elegance of this system is that it works entirely through smart contracts - no centralized market maker is needed!</p>
-</div>
-        
         <h2>Why Prediction Markets Matter</h2>
         
         <p>Polymarket is more than just a betting platform. It serves several important functions:</p>
@@ -640,7 +620,7 @@ priceImpact = (0.527 - 0.375) / 0.375 = 0.405 or 40.5%
         </ul>
         
         <div class="next-part">
-            <p>In Part 2, we'll explore advanced features, trading strategies, real-world examples, and the future of decentralized prediction markets. Stay tuned!</p>
+            <p>In Part 2, we'll explore advanced features, trading strategies, real-world examples, and the future of decentralized prediction markets.</p>
         </div>
     </article>
     
