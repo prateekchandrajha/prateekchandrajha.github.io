@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solving the Integral of x^m ln^n(x) | Prateek Chandra Jha</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        article {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+        
+        h1 {
+            color: #1a237e;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #303f9f;
+            margin-top: 40px;
+            border-bottom: 3px solid #e8eaf6;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #3f51b5;
+            margin-top: 30px;
+        }
+        
+        .meta {
+            color: #757575;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+        
+        .intro-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        
+        .concept-box {
+            background: #f5f7ff;
+            border-left: 5px solid #3f51b5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .example-box {
+            background: #e8f5e9;
+            border: 2px dashed #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .history-box {
+            background: #fff8e1;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .proof-box {
+            background: #e8eaf6;
+            border: 2px solid #3f51b5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .result-box {
+            background: #e0e0e0;
+            border: 2px solid #616161;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        blockquote {
+            background-color: #f5f7ff;
+            border-left: 5px solid #3f51b5;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+        
+        code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #757575;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+        }
+        
+        .formula-display {
+            text-align: center;
+            margin: 25px 0;
+            overflow-x: auto;
+        }
+        
+        .step-by-step {
+            counter-reset: step;
+            margin: 30px 0;
+        }
+        
+        .step {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 50px;
+        }
+        
+        .step::before {
+            counter-increment: step;
+            content: "Step " counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #3f51b5;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            article {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .step {
+                padding-left: 40px;
+            }
+            
+            .step::before {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <article>
+        <h1>Solving the Integral of \(x^m \ln^n(x)\)</h1>
+        <div class="meta">By Prateek Chandra Jha | February 2025</div>
+        
+        <div class="intro-box">
+            <p>While reviewing my old mathematics textbooks last weekend, I stumbled upon a fascinating integral that perfectly illustrates the beauty of change of variables techniques in calculus. The integral \(\int_0^1 x^m \ln^n(x) \, dx\) appears in various areas of mathematics, from statistical mechanics to complex analysis. Today, I'd like to share the elegant solution to this integral, demonstrating how successive substitutions can transform seemingly complex problems into familiar forms.</p>
+        </div>
+        
+        <h2>The Integral in Question</h2>
+        
+        <p>The integral we'll solve is:</p>
+        
+        <div class="formula-display">
+            \[ \int_0^1 x^m \ln^n(x) \, dx \]
+        </div>
+        
+        <p>where \(m\) and \(n\) are constants, with \(n\) being a non-negative integer. This integral combines two key functions—a power function \(x^m\) and a logarithmic function \(\ln^n(x)\)—creating an interesting analytical challenge.</p>
+        
+        <div class="concept-box">
+            <h3>Key Insight</h3>
+            <p>The key to solving this integral is to transform it into a form involving the gamma function \(\Gamma(z)\). This approach leverages the powerful connection between the gamma function and improper integrals of the form \(\int_0^{\infty} t^{q-1}e^{-t} \, dt\).</p>
+        </div>
+        
+        <h2>Solution Using Change of Variables</h2>
+        
+        <div class="proof-box">
+            <div class="step-by-step">
+                <div class="step">
+                    <p>We start by making our first substitution:</p>
+                    <div class="formula-display">
+                        \[ u = -\ln(x) \]
+                    </div>
+                    <p>This implies:</p>
+                    <div class="formula-display">
+                        \[ \ln(x) = -u \]
+                        \[ x = e^{-u} \]
+                        \[ dx = -e^{-u} \, du \]
+                    </div>
+                    <p>When \(x = 1\), \(u = 0\), and when \(x = 0\), \(u = \infty\).</p>
+                </div>
+                
+                <div class="step">
+                    <p>Substituting these expressions into our original integral:</p>
+                    <div class="formula-display">
+                        \begin{align}
+                        \int_0^1 x^m \ln^n(x) \, dx &= \int_{\infty}^0 (e^{-u})^m (-u)^n (-e^{-u} \, du) \\
+                        &= \int_{\infty}^0 e^{-um} (-u)^n (-e^{-u} \, du) \\
+                        &= \int_0^{\infty} e^{-um} (-u)^n (e^{-u} \, du) \\
+                        &= (-1)^n \int_0^{\infty} u^n e^{-(m+1)u} \, du
+                        \end{align}
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <p>We make a second substitution:</p>
+                    <div class="formula-display">
+                        \[ t = (m+1)u \]
+                    </div>
+                    <p>Which gives us:</p>
+                    <div class="formula-display">
+                        \[ u = \frac{t}{m+1} \]
+                        \[ du = \frac{dt}{m+1} \]
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <p>Applying this second substitution:</p>
+                    <div class="formula-display">
+                        \begin{align}
+                        (-1)^n \int_0^{\infty} u^n e^{-(m+1)u} \, du &= (-1)^n \int_0^{\infty} \left(\frac{t}{m+1}\right)^n e^{-t} \frac{dt}{m+1} \\
+                        &= (-1)^n \int_0^{\infty} \frac{t^n}{(m+1)^n} e^{-t} \frac{dt}{m+1} \\
+                        &= \frac{(-1)^n}{(m+1)^{n+1}} \int_0^{\infty} t^n e^{-t} \, dt
+                        \end{align}
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <p>We recognize that the integral \(\int_0^{\infty} t^{q-1} e^{-t} \, dt\) is the gamma function \(\Gamma(q)\). In our case, \(q-1 = n\), so \(q = n+1\):</p>
+                    <div class="formula-display">
+                        \begin{align}
+                        \frac{(-1)^n}{(m+1)^{n+1}} \int_0^{\infty} t^n e^{-t} \, dt &= \frac{(-1)^n}{(m+1)^{n+1}} \Gamma(n+1)
+                        \end{align}
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <p>Since \(\Gamma(n+1) = n!\) for non-negative integers \(n\), we get our final result:</p>
+                    <div class="formula-display">
+                        \begin{align}
+                        \int_0^1 x^m \ln^n(x) \, dx &= \frac{(-1)^n n!}{(m+1)^{n+1}}
+                        \end{align}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="result-box">
+            <div class="formula-display">
+                \[ \int_0^1 x^m \ln^n(x) \, dx = \frac{(-1)^n n!}{(m+1)^{n+1}} \]
+            </div>
+        </div>
+        
+        <h2>Understanding the Solution</h2>
+        
+        <p>The solution to this integral reveals several interesting mathematical properties:</p>
+        
+        <ol>
+            <li><strong>The sign alternates with \(n\)</strong>: Due to the \((-1)^n\) factor, the integral's sign alternates depending on whether \(n\) is even or odd.</li>
+            <li><strong>Factorial growth</strong>: The presence of \(n!\) means the integral's magnitude grows rapidly as \(n\) increases.</li>
+            <li><strong>Inverse relationship with \(m\)</strong>: As \(m\) increases, the integral's magnitude decreases, following an inverse power law.</li>
+        </ol>
+        
+        <h2>Special Cases</h2>
+        
+        <div class="example-box">
+            <h3>Case 1: \(n = 0\)</h3>
+            <p>When \(n = 0\), our formula simplifies to:</p>
+            <div class="formula-display">
+                \[ \int_0^1 x^m \, dx = \frac{1}{m+1} \]
+            </div>
+            <p>This is indeed correct, as the integral evaluates to \(\left[\frac{x^{m+1}}{m+1}\right]_0^1 = \frac{1}{m+1}\).</p>
+            
+            <h3>Case 2: \(n = 1\)</h3>
+            <p>When \(n = 1\), we get:</p>
+            <div class="formula-display">
+                \[ \int_0^1 x^m \ln(x) \, dx = \frac{-1!}{(m+1)^2} = \frac{-1}{(m+1)^2} \]
+            </div>
+            
+            <h3>Case 3: \(n = 2\)</h3>
+            <p>When \(n = 2\), we get:</p>
+            <div class="formula-display">
+                \[ \int_0^1 x^m \ln^2(x) \, dx = \frac{(-1)^2 \cdot 2!}{(m+1)^3} = \frac{2}{(m+1)^3} \]
+            </div>
+        </div>
+        
+        <h2>Connections to the Gamma Function</h2>
+        
+        <div class="concept-box">
+            <p>The gamma function \(\Gamma(z)\) is a fundamental special function that extends the factorial to complex numbers. It is defined as:</p>
+            <div class="formula-display">
+                \[ \Gamma(z) = \int_0^{\infty} t^{z-1} e^{-t} \, dt \]
+            </div>
+            <p>For positive integers \(n\), we have \(\Gamma(n) = (n-1)!\), which means \(\Gamma(n+1) = n!\).</p>
+            <p>Our solution leverages this connection to transform a complex integral involving logarithms into a standardized form involving the gamma function.</p>
+        </div>
+        
+        <h2>Applications</h2>
+        
+        <p>This integral appears in various areas of mathematics and physics:</p>
+        
+        <ul>
+            <li><strong>Statistical Mechanics</strong>: When calculating certain thermodynamic properties</li>
+            <li><strong>Probability Theory</strong>: In the computation of moments for certain probability distributions</li>
+            <li><strong>Mathematical Analysis</strong>: As a standard example in the theory of special functions</li>
+            <li><strong>Numerical Integration</strong>: As a test case for numerical methods</li>
+        </ul>
+        
+        <h2>Reflections on Mathematical Beauty</h2>
+        
+        <p>What I find most beautiful about this solution is how a seemingly complex integral transforms into an elegant expression through the careful application of substitution techniques. The connection to the gamma function—itself a profound mathematical object—highlights the deep interconnections within mathematics.</p>
+        
+        <p>This integral reminds me of a fundamental truth in mathematics: often, the key to solving a difficult problem isn't brute-force calculation but rather finding the right perspective—the right change of variables—that reveals the underlying simplicity.</p>
+        
+        <blockquote>
+            The art of doing mathematics consists in finding that special case which contains all the germs of generality. — David Hilbert
+        </blockquote>
+        
+        <p>These kinds of integrals, where the solution reveals unexpected patterns and connections, are what drew me to mathematics in the first place. They demonstrate that beneath the complex surface of mathematical problems often lies an elegant structure waiting to be discovered.</p>
+    </article>
+    
+    <footer>
+        <p>&copy; 2025 Prateek Chandra Jha. All rights reserved.</p>
+    </footer>
+</body>
+</html>
