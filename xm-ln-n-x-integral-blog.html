@@ -135,35 +135,6 @@
             overflow-x: auto;
         }
         
-        .step-by-step {
-            counter-reset: step;
-            margin: 30px 0;
-        }
-        
-        .step {
-            position: relative;
-            margin-bottom: 20px;
-            padding-left: 50px;
-        }
-        
-        .step::before {
-            counter-increment: step;
-            content: "Step " counter(step);
-            position: absolute;
-            left: 0;
-            top: 0;
-            background: #3f51b5;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        
         @media (max-width: 768px) {
             article {
                 padding: 20px;
@@ -171,16 +142,6 @@
             
             h1 {
                 font-size: 2em;
-            }
-            
-            .step {
-                padding-left: 40px;
-            }
-            
-            .step::before {
-                width: 30px;
-                height: 30px;
-                font-size: 12px;
             }
         }
     </style>
@@ -212,73 +173,47 @@
         <h2>Solution Using Change of Variables</h2>
         
         <div class="proof-box">
-            <div class="step-by-step">
-                <div class="step">
-                    <p>We start by making our first substitution:</p>
-                    <div class="formula-display">
-                        \[ u = -\ln(x) \]
-                    </div>
-                    <p>This implies:</p>
-                    <div class="formula-display">
-                        \[ \ln(x) = -u \]
-                        \[ x = e^{-u} \]
-                        \[ dx = -e^{-u} \, du \]
-                    </div>
-                    <p>When \(x = 1\), \(u = 0\), and when \(x = 0\), \(u = \infty\).</p>
-                </div>
-                
-                <div class="step">
-                    <p>Substituting these expressions into our original integral:</p>
-                    <div class="formula-display">
-                        \begin{align}
-                        \int_0^1 x^m \ln^n(x) \, dx &= \int_{\infty}^0 (e^{-u})^m (-u)^n (-e^{-u} \, du) \\
-                        &= \int_{\infty}^0 e^{-um} (-u)^n (-e^{-u} \, du) \\
-                        &= \int_0^{\infty} e^{-um} (-u)^n (e^{-u} \, du) \\
-                        &= (-1)^n \int_0^{\infty} u^n e^{-(m+1)u} \, du
-                        \end{align}
-                    </div>
-                </div>
-                
-                <div class="step">
-                    <p>We make a second substitution:</p>
-                    <div class="formula-display">
-                        \[ t = (m+1)u \]
-                    </div>
-                    <p>Which gives us:</p>
-                    <div class="formula-display">
-                        \[ u = \frac{t}{m+1} \]
-                        \[ du = \frac{dt}{m+1} \]
-                    </div>
-                </div>
-                
-                <div class="step">
-                    <p>Applying this second substitution:</p>
-                    <div class="formula-display">
-                        \begin{align}
-                        (-1)^n \int_0^{\infty} u^n e^{-(m+1)u} \, du &= (-1)^n \int_0^{\infty} \left(\frac{t}{m+1}\right)^n e^{-t} \frac{dt}{m+1} \\
-                        &= (-1)^n \int_0^{\infty} \frac{t^n}{(m+1)^n} e^{-t} \frac{dt}{m+1} \\
-                        &= \frac{(-1)^n}{(m+1)^{n+1}} \int_0^{\infty} t^n e^{-t} \, dt
-                        \end{align}
-                    </div>
-                </div>
-                
-                <div class="step">
-                    <p>We recognize that the integral \(\int_0^{\infty} t^{q-1} e^{-t} \, dt\) is the gamma function \(\Gamma(q)\). In our case, \(q-1 = n\), so \(q = n+1\):</p>
-                    <div class="formula-display">
-                        \begin{align}
-                        \frac{(-1)^n}{(m+1)^{n+1}} \int_0^{\infty} t^n e^{-t} \, dt &= \frac{(-1)^n}{(m+1)^{n+1}} \Gamma(n+1)
-                        \end{align}
-                    </div>
-                </div>
-                
-                <div class="step">
-                    <p>Since \(\Gamma(n+1) = n!\) for non-negative integers \(n\), we get our final result:</p>
-                    <div class="formula-display">
-                        \begin{align}
-                        \int_0^1 x^m \ln^n(x) \, dx &= \frac{(-1)^n n!}{(m+1)^{n+1}}
-                        \end{align}
-                    </div>
-                </div>
+            <p>We begin by making the change of variable \(u = -\ln(x)\). This gives us \(\ln(x) = -u\), which implies \(x = e^{-u}\) and \(dx = -e^{-u} \, du\). Also, when \(x = 1\), \(u = 0\), and when \(x = 0\), \(u = \infty\).</p>
+            
+            <p>Substituting these expressions into our original integral:</p>
+            
+            <div class="formula-display">
+                \begin{align}
+                \int_0^1 x^m \ln^n(x) \, dx &= \int_{\infty}^0 (e^{-u})^m (-u)^n (-e^{-u} \, du) \\
+                &= \int_{\infty}^0 e^{-um} (-u)^n (-e^{-u} \, du) \\
+                &= \int_0^{\infty} e^{-um} (-u)^n (e^{-u} \, du) \\
+                &= (-1)^n \int_0^{\infty} u^n e^{-(m+1)u} \, du
+                \end{align}
+            </div>
+            
+            <p>We proceed with another change of variable, setting \(t = (m+1)u\). This means \(u = \frac{t}{m+1}\) and \(du = \frac{dt}{m+1}\).</p>
+            
+            <p>Applying this substitution to our integral:</p>
+            
+            <div class="formula-display">
+                \begin{align}
+                (-1)^n \int_0^{\infty} u^n e^{-(m+1)u} \, du &= (-1)^n \int_0^{\infty} \left(\frac{t}{m+1}\right)^n e^{-t} \frac{dt}{m+1} \\
+                &= (-1)^n \int_0^{\infty} \frac{t^n}{(m+1)^n} e^{-t} \frac{dt}{m+1} \\
+                &= \frac{(-1)^n}{(m+1)^{n+1}} \int_0^{\infty} t^n e^{-t} \, dt
+                \end{align}
+            </div>
+            
+            <p>Now, we can recognize that the remaining integral \(\int_0^{\infty} t^n e^{-t} \, dt\) is related to the gamma function. Specifically, the gamma function is defined as \(\Gamma(q) = \int_0^{\infty} t^{q-1} e^{-t} \, dt\). In our case, \(q-1 = n\), so \(q = n+1\).</p>
+            
+            <p>Therefore:</p>
+            
+            <div class="formula-display">
+                \begin{align}
+                \frac{(-1)^n}{(m+1)^{n+1}} \int_0^{\infty} t^n e^{-t} \, dt &= \frac{(-1)^n}{(m+1)^{n+1}} \Gamma(n+1)
+                \end{align}
+            </div>
+            
+            <p>Since \(\Gamma(n+1) = n!\) for non-negative integers \(n\), we arrive at our final result:</p>
+            
+            <div class="formula-display">
+                \begin{align}
+                \int_0^1 x^m \ln^n(x) \, dx &= \frac{(-1)^n n!}{(m+1)^{n+1}}
+                \end{align}
             </div>
         </div>
         
