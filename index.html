@@ -8,125 +8,102 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
-            max-width: 800px;
+            color: #d4d4d4;
+            background-color: #121212;
+            max-width: 720px;
             margin: 0 auto;
             padding: 20px;
         }
         header {
-            text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         h1 {
-            color: #2c3e50;
+            color: #e0e0e0;
+            margin-bottom: 4px;
+        }
+        header p {
+            color: #9e9e9e;
+            margin-top: 0;
         }
         h2 {
-            color: #3498db;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            color: #e0e0e0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
             margin-top: 30px;
         }
-        .contact-info {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
+        a {
+            color: #6db3f2;
+            text-decoration: none;
         }
-        .poetry {
-            font-style: italic;
-            color: #555;
-            border-left: 3px solid #3498db;
-            padding-left: 20px;
-            margin: 20px 0;
+        a:hover {
+            text-decoration: underline;
         }
         .blog-link {
-            background-color: #f8f9fa;
+            background-color: #1e1e1e;
             padding: 15px;
             border-radius: 5px;
-            margin: 20px 0;
-            transition: all 0.3s ease;
+            margin: 15px 0;
+            transition: background-color 0.2s ease;
         }
         .blog-link:hover {
-            background-color: #e9ecef;
+            background-color: #2a2a2a;
         }
         .blog-link h3 {
             margin-top: 0;
+            margin-bottom: 6px;
         }
-        .blog-link a {
-            text-decoration: none;
-            color: #3498db;
+        .blog-link p {
+            margin: 0;
+            color: #aaa;
+            font-size: 0.95em;
+        }
+        .contact-info ul {
+            padding-left: 20px;
+        }
+        .contact-info li {
+            margin-bottom: 6px;
         }
         footer {
             text-align: center;
             margin-top: 50px;
             font-size: 0.9em;
-            color: #7f8c8d;
+            color: #666;
         }
     </style>
 </head>
 <body>
     <header>
         <h1>Prateek Chandra Jha</h1>
-        <p>Mathematics | Computer Science | Applied Sciences</p>
+        <p>Applied scientist working at the intersection of math and machine learning.</p>
     </header>
 
     <section id="about">
-        <h2>About Me</h2>
-        <p>I'm an experienced applied scientist with a background in industrial machine learning and a deep interest in wider mathematics and computer science.</p>
+        <h2>About</h2>
+        <p>I build things with machine learning and spend too much time thinking about the math behind them. Lately I've been digging into quantization theory, numerical linear algebra, and prediction markets.</p>
+        <p>If you want to work together or hire me for a project, email me at <a href="mailto:prateekchandrajha@gmail.com">prateekchandrajha@gmail.com</a>.</p>
     </section>
 
-    <section id="current-work">
-        <h2>What I'm Doing Today</h2>
-        <p>I'm roaming around from here to there, exploring the world with curious eyes and an open mind. As Wordsworth wrote:</p>
-        
-        <div class="poetry">
-            <p>"I wandered lonely as a cloud<br>
-            That floats on high o'er vales and hills,<br>
-            When all at once I saw a crowd,<br>
-            A host, of golden daffodils;<br>
-            Beside the lake, beneath the trees,<br>
-            Fluttering and dancing in the breeze."</p>
+    <section id="writing">
+        <h2>Writing</h2>
+
+        <div class="blog-link">
+            <h3><a href="turboquant-math.html">The Mathematics of Google's TurboQuant</a></h3>
+            <p>How random rotations, optimal quantizers, and a one-bit trick compress LLM memory by 6x while staying within 2.7x of the information-theoretic limit. Includes a puzzle about high-dimensional geometry.</p>
         </div>
-        
-        <h3>Professional Enquiries</h3>
-        <p>For my CV, please reach out to <a href="mailto:prateekchandrajha@gmail.com">prateekchandrajha@gmail.com</a>. Please note that this is only for those who wish to collaborate with me for R&D work or are interested in hiring me for specific projects.</p>
     </section>
 
     <section id="contact" class="contact-info">
-        <h2>Contact Me</h2>
-        <p>I'm always open to interesting conversations and collaborations. Feel free to reach out:</p>
+        <h2>Links</h2>
         <ul>
-            <li>📧 Email: <a href="mailto:prateekchandrajha@gmail.com">prateekchandrajha@gmail.com</a></li>
-            <li>🔗 LinkedIn: <a href="https://www.linkedin.com/in/prateek-chandra-j-9906632a/" target="_blank">LinkedIn Profile</a></li>
-            <li>🐦 X/Twitter: <a href="https://x.com/prateekjha" target="_blank">@prateekjha</a></li>
-            <li>💻 GitHub: <a href="https://github.com/prateekchandrajha" target="_blank">github.com/prateekchandrajha</a></li>
+            <li>Email: <a href="mailto:prateekchandrajha@gmail.com">prateekchandrajha@gmail.com</a></li>
+            <li>LinkedIn: <a href="https://www.linkedin.com/in/prateek-chandra-j-9906632a/" target="_blank">Profile</a></li>
+            <li>X: <a href="https://x.com/prateekjha" target="_blank">@prateekjha</a></li>
+            <li>GitHub: <a href="https://github.com/prateekchandrajha" target="_blank">prateekchandrajha</a></li>
         </ul>
     </section>
 
-    <section id="thoughts">
-        <h2>My Thoughts</h2>
-        <p>Here are some of my perspectives on mathematics, computer science, and applied sciences:</p>
-        
-        <div class="blog-link">
-            <h3><a href="qr-algorithm-confusion.html">The QR Algorithm: Why It Confuses the Hell Out of Me</a></h3>
-            <p>An exploration of the QR algorithm, its mathematical elegance, and why it simultaneously amazes and confounds me. This blog will feature interactive elements, mathematical equations, and my thoughts on how this works so well in modern linear algebra packages.</p>
-        </div>
-
-        <div class="blog-link">
-            <h3><a href="polymarket-blog-part1.html">Decoding Polymarket: How Prediction Markets Actually Work (Part 1)</a></h3>
-            <p>Get to know the world of decentralized prediction markets where you can bet on anything from politics to cryptocurrency prices. Learn how Polymarket uses blockchain technology to create trustless, transparent markets for forecasting real-world events.</p>
-        </div>
-
-        <div class="blog-link">
-            <h3><a href="xm-ln-n-x-integral-blog.html">The Challenging Integral of x^m ln^n(x)</a></h3>
-            <p>When I recently found myself debugging a particularly complex optimization algorithm late at night, my mind wandered to an intriguing mathematical challenge I first encountered in graduate school: the integral of x^m ln^n(x).</p>
-        </div>
-
-        
-    </section>
-
     <footer>
-        <p>&copy; 2025 Prateek Chandra Jha. All rights reserved.</p>
+        <p>&copy; 2026 Prateek Chandra Jha</p>
     </footer>
 </body>
 </html>

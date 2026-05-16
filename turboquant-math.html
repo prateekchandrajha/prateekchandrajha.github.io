@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mathematics of Google's TurboQuant | Prateek Chandra Jha</title>
+    <script>
+        MathJax = {
+            chtml: {
+                displayAlign: 'center',
+                displayIndent: '0'
+            },
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        mjx-container {
+            color: #d4d4d4 !important;
+        }
+        mjx-container[display="true"] {
+            overflow-x: auto;
+            max-width: 100%;
+            padding: 10px 0;
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #d4d4d4;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #0d0d0d;
+        }
+        article {
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.4);
+        }
+        h1 {
+            color: #e8e8e8;
+            font-size: 2.2em;
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #e0e0e0;
+            margin-top: 45px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 8px;
+        }
+        h3 {
+            color: #b0c4de;
+            margin-top: 30px;
+        }
+        .date {
+            color: #777;
+            margin-bottom: 35px;
+            font-size: 0.95em;
+        }
+        a {
+            color: #6db3f2;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #8eccff;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 25px;
+        }
+        .key-idea {
+            background-color: #1a2634;
+            border-left: 4px solid #4a9ede;
+            padding: 18px 20px;
+            margin: 25px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .key-idea strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #8eccff;
+        }
+        .puzzle-box {
+            background: #2a2010;
+            border: 2px solid #a07828;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .puzzle-box h3 {
+            color: #e8b84a;
+            margin-top: 0;
+        }
+        .solution-box {
+            background: #142014;
+            border: 2px solid #4a8a4a;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .solution-box h3 {
+            color: #6abf6a;
+            margin-top: 0;
+        }
+        .toggle-btn {
+            background: #a07828;
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+        .toggle-btn:hover {
+            background: #c09030;
+        }
+        .hidden {
+            display: none;
+        }
+        .stage-box {
+            background: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 22px;
+            margin: 20px 0;
+        }
+        .stage-box h3 {
+            margin-top: 0;
+        }
+        .result-box {
+            background: #0a1628;
+            color: #e0e0e0;
+            padding: 22px;
+            border-radius: 8px;
+            margin: 25px 0;
+            text-align: center;
+            border: 1px solid #2a4a6a;
+        }
+        .result-box .MathJax {
+            color: white !important;
+        }
+        .code-block {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            border-left: 4px solid #4a9ede;
+            padding: 15px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border-radius: 0 4px 4px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            white-space: pre;
+            color: #c8c8c8;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #3a3a3a;
+            padding: 10px 14px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: #252525;
+            color: #e0e0e0;
+        }
+        .comparison-table tr:nth-child(even) {
+            background: #1e1e1e;
+        }
+        .timeline {
+            border-left: 3px solid #4a9ede;
+            padding-left: 25px;
+            margin: 25px 0;
+        }
+        .timeline-item {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #4a9ede;
+            border-radius: 50%;
+            position: absolute;
+            left: -31px;
+            top: 5px;
+        }
+        .timeline-item .year {
+            font-weight: bold;
+            color: #6db3f2;
+        }
+        figure {
+            margin: 30px 0;
+            text-align: center;
+        }
+        figure .diagram {
+            background: #0d0d0d;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 25px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            display: inline-block;
+            text-align: left;
+            white-space: pre;
+            overflow-x: auto;
+            max-width: 100%;
+            color: #b0b0b0;
+        }
+        figcaption {
+            color: #777;
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #666;
+        }
+        .appendix-divider {
+            border: none;
+            border-top: 3px double #444;
+            margin: 60px 0 40px 0;
+        }
+        .example-worked {
+            background: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 22px;
+            margin: 20px 0;
+        }
+        .example-worked h4 {
+            margin-top: 0;
+            color: #e0e0e0;
+        }
+        .definition-box {
+            background: #1a1528;
+            border-left: 4px solid #9070d0;
+            padding: 18px 20px;
+            margin: 25px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .definition-box strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #b898e8;
+        }
+        .connection-box {
+            background: #28200a;
+            border-left: 4px solid #d09030;
+            padding: 18px 20px;
+            margin: 25px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .connection-box strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #e8b040;
+        }
+        @media (max-width: 768px) {
+            article { padding: 20px; }
+            h1 { font-size: 1.7em; }
+        }
+    </style>
+</head>
+<body>
+    <a class="back-link" href="index.html">&larr; Back to home</a>
+
+    <article>
+        <h1>The Mathematics of Google's TurboQuant</h1>
+        <div class="date">May 2026</div>
+
+        <p>In March 2026, Google Research published a paper that rattled memory chip stocks and made Cloudflare's CEO call it "Google's DeepSeek moment." The paper is about compressing numbers. Specifically, it describes an algorithm called <strong>TurboQuant</strong> that compresses the key-value cache of large language models to ~3 bits per value &mdash; a 6x reduction &mdash; with effectively no loss in quality.</p>
+
+        <p>What makes this interesting is not the engineering result (impressive as it is) but the mathematics underneath. TurboQuant is a clean demonstration of how three old ideas &mdash; random rotations, optimal quantization, and the Johnson-Lindenstrauss lemma &mdash; combine into something greater than the sum of their parts.</p>
+
+        <p>This post walks through the math. I'll start with a puzzle, then build up each piece of the algorithm, and end with why the result is close to the best anyone can ever do.</p>
+
+        <!-- ===== THE PUZZLE ===== -->
+        <h2>A Puzzle to Start</h2>
+
+        <div class="puzzle-box">
+            <h3>The Random Rotation Puzzle</h3>
+            <p>Imagine you have a vector in 1000 dimensions. All of its energy is concentrated in a single coordinate:</p>
+            $$\mathbf{v} = (1000, \; 0, \; 0, \; 0, \; \ldots, \; 0) \in \mathbb{R}^{1000}$$
+            <p>Now apply a random rotation to this vector &mdash; pick a uniformly random orthogonal matrix \(Q\) and compute \(Q\mathbf{v}\).</p>
+            <p><strong>Question:</strong> After the rotation, roughly what does each coordinate of \(Q\mathbf{v}\) look like? Are most of them still zero? Are a few of them large? Or does something else happen entirely?</p>
+            <p><strong>Bonus:</strong> What probability distribution do the individual coordinates follow?</p>
+            <button class="toggle-btn" onclick="toggleSolution()">Reveal the Answer</button>
+        </div>
+
+        <div id="solution" class="solution-box hidden">
+            <h3>The Answer</h3>
+            <p>Something surprising happens: <strong>every single coordinate becomes roughly the same size.</strong> Not a few large ones and many zeros &mdash; all of them, roughly equal. Let's see why, step by step.</p>
+
+            <h3>Step 1: What does \(Q\mathbf{v}\) actually compute?</h3>
+
+            <p>Our vector is \(\mathbf{v} = (1000, 0, 0, \ldots, 0)\). Multiplying by an orthogonal matrix \(Q\) gives:</p>
+
+            $$(Q\mathbf{v})_i = \sum_{j=1}^{d} Q_{ij} \, v_j = Q_{i1} \cdot 1000$$
+
+            <p>So the \(i\)-th coordinate of the rotated vector is just \(1000 \times Q_{i1}\) &mdash; it's 1000 times the first column of \(Q\). The question reduces to: <em>what do the entries of a single column of a uniformly random orthogonal matrix look like?</em></p>
+
+            <h3>Step 2: A column of a random orthogonal matrix is a random unit vector</h3>
+
+            <p>What does "a uniformly random orthogonal matrix" even mean? An orthogonal matrix is one whose columns are mutually perpendicular unit vectors. The set of all such \(d \times d\) matrices forms a group called \(O(d)\). We need to pick one "at random" from this set &mdash; but it's a continuous set, so we can't just pick each entry independently.</p>
+
+            <p>The right notion is: choose \(Q\) so that the distribution is <strong>invariant under further rotation</strong>. That is, if \(Q\) is our random matrix and \(R\) is any fixed orthogonal matrix, then \(RQ\) has exactly the same distribution as \(Q\). There's a theorem (due to Haar) that exactly one probability distribution on \(O(d)\) has this property. It's called the <strong>Haar measure</strong>, and it's the natural meaning of "uniformly random rotation."</p>
+
+            <p>A concrete way to sample from it: take a \(d \times d\) matrix of i.i.d. standard Gaussians and run the Gram-Schmidt process (or QR decomposition) on its columns. The resulting orthogonal matrix is Haar-distributed.</p>
+
+            <p>The key consequence for us: by the rotational invariance property, no direction in \(\mathbb{R}^d\) is special. Every column of \(Q\) is a <strong>uniformly random point on the unit sphere</strong> \(S^{d-1}\). The first column \(\mathbf{u} = (Q_{11}, Q_{21}, \ldots, Q_{d1})\) satisfies:</p>
+
+            $$\|\mathbf{u}\|^2 = \sum_{i=1}^{d} u_i^2 = 1$$
+
+            <p>So our problem becomes: take a point \(\mathbf{u}\) uniformly distributed on the unit sphere in \(\mathbb{R}^{1000}\), and look at one coordinate \(u_i\). What distribution does it follow?</p>
+
+            <h3>Step 3: Deriving the distribution (where the Beta comes from)</h3>
+
+            <p>Here's the standard construction. To generate a uniform random point on \(S^{d-1}\), take \(d\) independent standard Gaussians \(g_1, \ldots, g_d \sim \mathcal{N}(0,1)\) and normalize:</p>
+
+            $$u_i = \frac{g_i}{\sqrt{g_1^2 + g_2^2 + \cdots + g_d^2}}$$
+
+            <p>Now consider the squared coordinate \(u_i^2\):</p>
+
+            $$u_i^2 = \frac{g_i^2}{g_1^2 + g_2^2 + \cdots + g_d^2} = \frac{g_i^2}{g_i^2 + \underbrace{(g_1^2 + \cdots + g_{i-1}^2 + g_{i+1}^2 + \cdots + g_d^2)}_{\text{sum of } d-1 \text{ other squared Gaussians}}}$$
+
+            <p>The numerator \(g_i^2 \sim \chi^2(1)\) is a chi-squared random variable with 1 degree of freedom. The remaining sum in the denominator is \(\chi^2(d-1)\), independent of \(g_i^2\). A classical result in probability says that if \(X \sim \chi^2(a)\) and \(Y \sim \chi^2(b)\) are independent, then:</p>
+
+            $$\frac{X}{X + Y} \sim \operatorname{Beta}\!\left(\frac{a}{2}, \frac{b}{2}\right)$$
+
+            <p>Applying this with \(a = 1\) and \(b = d - 1\):</p>
+
+            $$\boxed{u_i^2 \sim \operatorname{Beta}\!\left(\frac{1}{2}, \; \frac{d-1}{2}\right)}$$
+
+            <p>This is the exact distribution. For our puzzle with \(d = 1000\), each squared coordinate of the unit vector follows \(\operatorname{Beta}(1/2, \; 499.5)\).</p>
+
+            <h3>Step 4: What does this Beta distribution look like? (the magnitude argument)</h3>
+
+            <p>The mean of \(\operatorname{Beta}(\alpha, \beta)\) is \(\alpha / (\alpha + \beta)\). So:</p>
+
+            $$\mathbb{E}[u_i^2] = \frac{1/2}{1/2 + (d-1)/2} = \frac{1}{d}$$
+
+            <p>This makes geometric sense: there are \(d\) coordinates, they must share a total squared length of 1, and by symmetry each gets an equal share of \(1/d\).</p>
+
+            <p>The variance of this Beta is:</p>
+
+            $$\operatorname{Var}(u_i^2) = \frac{\alpha \beta}{(\alpha+\beta)^2(\alpha+\beta+1)} = \frac{\frac{1}{2} \cdot \frac{d-1}{2}}{\left(\frac{d}{2}\right)^2 \cdot \frac{d+2}{2}} \approx \frac{2}{d^2} \quad \text{for large } d$$
+
+            <p>The standard deviation of \(u_i^2\) is \(\approx \sqrt{2}/d\). Notice that this is actually <em>larger</em> than the mean \(1/d\) by a factor of \(\sqrt{2}\) &mdash; so any individual \(u_i^2\) is <em>not</em> tightly concentrated around its mean. Individual coordinates have real spread.</p>
+
+            <p>But here's what matters for TurboQuant: we don't need individual coordinates to be concentrated. We need every coordinate to follow the <strong>same known distribution</strong>, regardless of the input vector's direction. And that's exactly what the rotation guarantees. The distribution \(\operatorname{Beta}(1/2, (d-1)/2)\) depends only on \(d\) &mdash; not on \(\mathbf{v}\). This means we can precompute the optimal quantizer for this distribution once, and it works for every vector we'll ever see.</p>
+
+            <p>Now, coming back to our original vector: \((Q\mathbf{v})_i = 1000 \cdot u_i\), so:</p>
+
+            $$\mathbb{E}[(Q\mathbf{v})_i^2] = 1000^2 \cdot \mathbb{E}[u_i^2] = 1000^2 \cdot \frac{1}{1000} = 1000$$
+
+            <p>The root-mean-square value of each coordinate is \(\sqrt{1000} \approx 31.6\). That's the typical magnitude, and that's where the \(\|\mathbf{v}\| / \sqrt{d}\) figure comes from. Individual coordinates will vary around this &mdash; some larger, some smaller &mdash; but they're all drawn from the same predictable distribution.</p>
+
+            <h3>Step 5: The Gaussian approximation (why it looks normal)</h3>
+
+            <p>Recall that \(u_i = g_i / \sqrt{g_1^2 + \cdots + g_d^2}\). By the law of large numbers, the denominator concentrates:</p>
+
+            $$\frac{1}{d}\sum_{j=1}^{d} g_j^2 \;\xrightarrow{\;d \to \infty\;}\; 1 \qquad \text{so} \qquad \sqrt{\sum g_j^2} \approx \sqrt{d}$$
+
+            <p>Therefore:</p>
+
+            $$u_i \approx \frac{g_i}{\sqrt{d}} \sim \mathcal{N}\!\left(0, \frac{1}{d}\right)$$
+
+            <p>And for the rotated vector:</p>
+
+            $$(Q\mathbf{v})_i = 1000 \cdot u_i \;\approx\; \mathcal{N}\!\left(0, \;\frac{1000^2}{1000}\right) = \mathcal{N}(0, \; 1000)$$
+
+            <p>This is the Gaussian approximation. It becomes accurate as \(d\) grows because the denominator \(\sqrt{\sum g_j^2}\) has vanishing relative fluctuations: its coefficient of variation is \(O(1/\sqrt{d})\). At \(d = 1000\), the approximation is already very good.</p>
+
+            <h3>Step 6: Why are the coordinates nearly independent?</h3>
+
+            <p>This is the subtlest point. The coordinates of a uniform random unit vector are <em>not</em> exactly independent &mdash; they satisfy the constraint \(\sum u_i^2 = 1\), which couples them. But the coupling becomes negligible in high dimensions. Here's why.</p>
+
+            <p>Consider two coordinates \(u_i\) and \(u_j\) with \(i \neq j\). Their covariance is:</p>
+
+            $$\operatorname{Cov}(u_i, u_j) = \mathbb{E}[u_i \, u_j] - \mathbb{E}[u_i]\mathbb{E}[u_j]$$
+
+            <p>By symmetry, \(\mathbb{E}[u_i] = 0\) (the sphere is symmetric under sign flips). So \(\operatorname{Cov}(u_i, u_j) = \mathbb{E}[u_i \, u_j]\).</p>
+
+            <p>To compute this, use the Gaussian construction again: \(u_i u_j = g_i g_j / \sum g_k^2\). Since \(g_i\) and \(g_j\) are independent standard Gaussians, \(\mathbb{E}[g_i g_j] = 0\). The denominator \(\sum g_k^2\) is independent of the <em>product</em> \(g_i g_j\) (by a symmetry argument involving rotational invariance of the Gaussian), so:</p>
+
+            $$\mathbb{E}[u_i \, u_j] = \mathbb{E}\!\left[\frac{g_i g_j}{\sum g_k^2}\right] = 0$$
+
+            <p>Wait &mdash; the covariance is exactly zero? Not just small? Almost. The covariance is indeed exactly zero: \(\operatorname{Cov}(u_i, u_j) = 0\). But zero covariance doesn't imply independence.</p>
+
+            <p>The deeper fact is about <em>higher-order correlations</em>. For example, consider \(\operatorname{Cov}(u_i^2, u_j^2)\). To compute this, we need \(\mathbb{E}[u_i^2 u_j^2]\). Let's derive it from scratch.</p>
+
+            <p>Using the Gaussian construction, \(u_i = g_i / \|\mathbf{g}\|\), so:</p>
+
+            $$\mathbb{E}[u_i^2 u_j^2] = \mathbb{E}\!\left[\frac{g_i^2 \, g_j^2}{\left(\sum_{k=1}^d g_k^2\right)^2}\right]$$
+
+            <p>Since \(g_i\) and \(g_j\) are independent of each other (and of all other \(g_k\)'s), the numerator and denominator are not independent &mdash; \(g_i^2\) and \(g_j^2\) both appear in the sum. But we can use a known identity for ratios of Gaussian products. For independent \(g_k \sim \mathcal{N}(0,1)\) and distinct indices \(i \neq j\):</p>
+
+            $$\mathbb{E}\!\left[\frac{g_i^2 \, g_j^2}{\left(\sum_{k=1}^d g_k^2\right)^2}\right] = \frac{\mathbb{E}[g_i^2] \cdot \mathbb{E}[g_j^2]}{d(d+2)} = \frac{1 \cdot 1}{d(d+2)} = \frac{1}{d(d+2)}$$
+
+            <p>Where does the \(d(d+2)\) come from? It's a standard result about moments of the Dirichlet distribution. The vector \((u_1^2, u_2^2, \ldots, u_d^2)\) follows a symmetric Dirichlet distribution with parameter \(\alpha = 1/2\). For a symmetric Dirichlet with parameter \(\alpha\) and \(d\) components, the second mixed moment is:</p>
+
+            $$\mathbb{E}[u_i^2 u_j^2] = \frac{\alpha(\alpha+1) \cdot \alpha(\alpha+1)}{(d\alpha)(d\alpha+1)(d\alpha+2)(d\alpha+3)} \cdot \ldots$$
+
+            <p>Actually, let's get there more directly. The trick is to recognize that \((g_1^2, \ldots, g_d^2) / \sum g_k^2\) has the same distribution as a normalized vector of independent \(\chi^2(1)\) variables. For such vectors, there's a clean formula: if \(X_1, \ldots, X_d\) are i.i.d. \(\chi^2(1)\) and \(S = \sum X_k\), then for \(i \neq j\):</p>
+
+            $$\mathbb{E}\!\left[\frac{X_i X_j}{S^2}\right] = \frac{\mathbb{E}[X_i] \cdot \mathbb{E}[X_j]}{\mathbb{E}[S] \cdot (\mathbb{E}[S] + 2)} = \frac{1 \cdot 1}{d \cdot (d + 2)}$$
+
+            <p>This follows because \(X_i/S\) and \(X_j/S\) are marginally \(\operatorname{Beta}(1/2, (d-1)/2)\), and their joint distribution is Dirichlet. The factor \((d+2)\) instead of \((d+1)\) comes from the specific moments of the chi-squared: \(\mathbb{E}[X^2] = \operatorname{Var}(X) + (\mathbb{E}[X])^2 = 2 + 1 = 3\) for \(\chi^2(1)\), and this propagates through the ratio as the "+2" correction.</p>
+
+            <p>Now we can compute the covariance. We already know \(\mathbb{E}[u_i^2] = 1/d\), so:</p>
+
+            $$\operatorname{Cov}(u_i^2, u_j^2) = \mathbb{E}[u_i^2 u_j^2] - \mathbb{E}[u_i^2]\mathbb{E}[u_j^2] = \frac{1}{d(d+2)} - \frac{1}{d^2} = \frac{d - (d+2)}{d^2(d+2)} = -\frac{2}{d^2(d+2)}$$
+
+            <p>This is negative (knowing one coordinate is large makes others slightly smaller, by the sphere constraint) but scales as \(O(1/d^3)\), while each variance is \(O(1/d^2)\). The correlation coefficient is:</p>
+
+            $$\rho(u_i^2, u_j^2) = \frac{\operatorname{Cov}(u_i^2, u_j^2)}{\operatorname{Var}(u_i^2)} \approx \frac{-2/d^3}{2/d^2} = -\frac{1}{d}$$
+
+            <p>At \(d = 1000\), this correlation is \(-0.001\). For all practical purposes, the coordinates are independent. This is a manifestation of the <strong>concentration of measure</strong> phenomenon on high-dimensional spheres: local behavior (a single coordinate) is almost decoupled from the global constraint (\(\sum u_i^2 = 1\)) because each coordinate carries only a \(1/d\) fraction of the total.</p>
+
+            <h3>Putting it all together</h3>
+
+            <p>After a random rotation of any vector \(\mathbf{v} \in \mathbb{R}^d\):</p>
+            <ol>
+                <li>Each coordinate of \(Q\mathbf{v}\) has <strong>exactly</strong> the distribution \(\|\mathbf{v}\| \cdot u_i\) where \(u_i^2 \sim \operatorname{Beta}(1/2, (d-1)/2)\).</li>
+                <li>The typical magnitude is \(\|\mathbf{v}\|/\sqrt{d}\), with tight concentration around this value.</li>
+                <li>For large \(d\), each coordinate is well-approximated by \(\mathcal{N}(0, \|\mathbf{v}\|^2/d)\).</li>
+                <li>Distinct coordinates are uncorrelated and, for large \(d\), nearly independent (correlations scale as \(1/d\)).</li>
+            </ol>
+
+            <p>This is the core mathematical trick behind TurboQuant. If you can make every coordinate look the same &mdash; drawn from a known, predictable distribution with near-independence &mdash; then you can design an optimal scalar quantizer once and apply it to every coordinate. No need to inspect the data. No need for calibration. Just rotate and quantize.</p>
+        </div>
+
+        <!-- ===== THE PROBLEM ===== -->
+        <h2>The Problem: LLMs Are Drowning in Memory</h2>
+
+        <p>Large language models like Llama, Gemini, and GPT run on a mechanism called <strong>attention</strong>. Every time the model processes a new token, it computes inner products between the current token's query vector and the key vectors of all previous tokens. The key and value vectors from all past tokens are stored in something called the <strong>KV cache</strong>.</p>
+
+        <p>The KV cache grows linearly with context length. For Llama 3.1 70B processing a 128K-token context, the KV cache alone consumes roughly 40 GB of GPU memory &mdash; often more than the model weights themselves.</p>
+
+        <p>The question is: can we store these vectors at lower precision without breaking the attention computation?</p>
+
+        <p>This is a <strong>vector quantization</strong> problem, and it has been studied since Shannon's 1959 source coding theory. The challenge is that naive quantization (just round each number to the nearest low-precision value) introduces errors that accumulate as bias in the attention scores. TurboQuant solves this elegantly.</p>
+
+        <!-- ===== THE THREE PAPERS ===== -->
+        <h2>The Three-Paper Arc</h2>
+
+        <p>TurboQuant didn't appear from nowhere. It's the final piece of a research program spanning three papers:</p>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <span class="year">AAAI 2025</span> &mdash; <strong>QJL (Quantized Johnson-Lindenstrauss)</strong><br>
+                Showed that the sign of a random projection preserves enough angular information to debias dot product estimates at a cost of 1 bit per dimension.
+            </div>
+            <div class="timeline-item">
+                <span class="year">AISTATS 2026</span> &mdash; <strong>PolarQuant</strong><br>
+                Showed that randomly rotating a vector makes each coordinate follow a known Beta distribution, enabling precomputed optimal scalar quantizers with zero calibration.
+            </div>
+            <div class="timeline-item">
+                <span class="year">ICLR 2026</span> &mdash; <strong>TurboQuant</strong><br>
+                Combined PolarQuant (rotation + Lloyd-Max quantization) with QJL (1-bit residual correction) to achieve near-optimal distortion with unbiased inner products.
+            </div>
+        </div>
+
+        <p>Let's look at each piece.</p>
+
+        <!-- ===== STAGE 1: POLARQUANT ===== -->
+        <h2>Stage 1: PolarQuant &mdash; Rotation Makes Everything Predictable</h2>
+
+        <p>Consider a vector \(\mathbf{x} \in \mathbb{R}^d\) that we want to quantize. In a KV cache, \(d\) is the head dimension (typically 64&ndash;128). The vector could have any shape &mdash; some coordinates large, others small, the distribution varying from token to token.</p>
+
+        <p>PolarQuant's insight is to apply a random orthogonal rotation first:</p>
+        $$\tilde{\mathbf{x}} = Q \mathbf{x}$$
+        <p>where \(Q \in \mathbb{R}^{d \times d}\) is a random orthogonal matrix (generated once, shared across all vectors). This is exactly the setup from our puzzle.</p>
+
+        <h3>Why does rotation help?</h3>
+
+        <p>After rotation, each coordinate \(\tilde{x}_i\) of the transformed vector follows a distribution that depends only on \(\|\mathbf{x}\|\) and \(d\), not on the direction of \(\mathbf{x}\). Specifically:</p>
+
+        $$\tilde{x}_i = \|\mathbf{x}\| \cdot z_i$$
+
+        <p>where \(z_i\) is the \(i\)-th coordinate of a uniformly random unit vector in \(\mathbb{R}^d\). This coordinate follows a <strong>shifted and scaled Beta distribution</strong>:</p>
+
+        <div style="margin: 25px 0; overflow-x: auto;">
+        $$z_i^2 \;\sim\; \operatorname{Beta}\!\bigl(\tfrac{1}{2}, \; \tfrac{d-1}{2}\bigr)$$
+        </div>
+
+        <p>For large \(d\), the central limit theorem kicks in and \(z_i \approx \mathcal{N}(0, 1/d)\). Moreover, distinct coordinates become nearly independent.</p>
+
+        <div class="key-idea">
+            <strong>The key consequence:</strong> Because the post-rotation distribution is known analytically and does not depend on the input data, we can precompute the optimal quantizer once, before seeing any data. This is what makes TurboQuant <em>data-oblivious</em> &mdash; no calibration set, no fine-tuning, no codebook training.
+        </div>
+
+        <h3>The Lloyd-Max Quantizer</h3>
+
+        <p>Given a known probability distribution \(p(z)\) and a budget of \(b\) bits (giving \(2^b\) possible output levels), the <strong>Lloyd-Max quantizer</strong> is the scalar quantizer that minimizes mean squared error (MSE).</p>
+
+        <p>It works by solving a one-dimensional optimization: partition the real line into \(2^b\) intervals and assign a representative value to each interval, chosen to minimize:</p>
+
+        $$\operatorname{MSE} = \int_{-\infty}^{\infty} (z - Q_b(z))^2 \, p(z) \, dz$$
+
+        <p>where \(Q_b(z)\) maps \(z\) to its nearest representative. The optimal partition boundaries and representatives satisfy a pair of necessary conditions (essentially: boundaries are midpoints of adjacent representatives, and representatives are conditional means within their intervals). These can be solved numerically by alternating between the two conditions &mdash; which is exactly Lloyd's algorithm (also known as k-means in one dimension).</p>
+
+        <p>Because the Beta distribution is known, PolarQuant precomputes the Lloyd-Max quantizer for each target bitwidth once. At runtime, quantizing a coordinate is a table lookup.</p>
+
+        <p>This is easier to understand with examples. Let's build up from the simplest case.</p>
+
+        <div class="example-worked">
+            <h4>Example: 1-bit quantizer for a uniform distribution</h4>
+
+            <p>Suppose our values are drawn from a uniform distribution on \([-1, 1]\), and we have 1 bit &mdash; just 2 possible output levels. Where should we place them?</p>
+
+            <p>Lloyd-Max says: partition \([-1, 1]\) into two intervals, and set each representative to the conditional mean within its interval. By symmetry, the boundary is at 0:</p>
+
+            <figure><div class="diagram">
+        -1              0              +1
+         |------[--x--]--|--[--x--]------|
+              r&#8321;=-0.5       r&#8322;=+0.5
+
+   Interval 1: [-1, 0)    &#8594;  output -0.5
+   Interval 2: [0, +1]    &#8594;  output +0.5
+            </div></figure>
+
+            <p>The representative for \([-1, 0)\) is \(\mathbb{E}[z \mid z \in [-1, 0)] = -0.5\). Similarly for the other half. Any value in \([-1, 0)\) gets mapped to \(-0.5\); any value in \([0, 1]\) gets mapped to \(+0.5\).</p>
+
+            <p>The MSE is \(\mathbb{E}[(z - Q(z))^2] = \frac{1}{12} \approx 0.083\). (Each half contributes the variance of a uniform on an interval of width 1, which is \(1/12\).)</p>
+        </div>
+
+        <div class="example-worked">
+            <h4>Example: 2-bit quantizer for a uniform distribution</h4>
+
+            <p>Now we have 2 bits &mdash; 4 output levels. For the uniform distribution on \([-1, 1]\), Lloyd-Max splits into 4 equal intervals:</p>
+
+            <figure><div class="diagram">
+     -1      -0.5       0       +0.5      +1
+      |--[x]---|---[x]---|---[x]---|---[x]--|
+       r&#8321;=-0.75  r&#8322;=-0.25  r&#8323;=+0.25  r&#8324;=+0.75
+
+   Interval 1: [-1, -0.5)    &#8594;  output -0.75
+   Interval 2: [-0.5, 0)     &#8594;  output -0.25
+   Interval 3: [0, +0.5)     &#8594;  output +0.25
+   Interval 4: [0.5, +1]     &#8594;  output +0.75
+            </div></figure>
+
+            <p>MSE = \(\frac{1}{48} \approx 0.021\). Going from 1 bit to 2 bits cut the MSE by 4x. This is the \(4^{-b}\) scaling: each extra bit reduces MSE by a factor of 4 (for well-behaved distributions).</p>
+        </div>
+
+        <div class="example-worked">
+            <h4>Example: 2-bit quantizer for a Gaussian &mdash; non-uniform intervals</h4>
+
+            <p>Now the values follow a standard normal \(\mathcal{N}(0, 1)\) instead of a uniform. Most values cluster near 0, with rare outliers. If we used equal-width intervals (like above), we'd waste two output levels on the tails where almost no data lives.</p>
+
+            <p>Lloyd-Max adapts: it places narrower intervals where the density is high (near 0) and wider intervals in the sparse tails:</p>
+
+            <figure><div class="diagram">
+  density:          ___
+                  /     \
+                /         \
+              /             \
+           __/               \__
+     ____/                       \____
+  ---|-----|---------|---------|-----|---
+   -&#8734;   -1.51     -0.45     +0.45   +1.51   +&#8734;
+
+   Interval 1: (-&#8734;, -0.9816)   &#8594;  output -1.51
+   Interval 2: [-0.9816, 0)     &#8594;  output -0.45
+   Interval 3: [0, +0.9816)     &#8594;  output +0.45
+   Interval 4: [+0.9816, +&#8734;)   &#8594;  output +1.51
+            </div></figure>
+
+            <p>Notice the asymmetry in interval widths: the inner intervals (covering the dense center) are narrower (\(\approx 0.98\) wide) than the outer intervals (stretching to infinity). This is <em>not</em> something you can get from simple "round to nearest" quantization &mdash; it specifically accounts for where the data actually lives.</p>
+
+            <p>The MSE for this optimal 2-bit Gaussian quantizer is about 0.2356, compared to the variance of 1.0 &mdash; so we capture about 76% of the signal with just 4 levels.</p>
+
+            <p>The representatives (\(\pm 0.45\), \(\pm 1.51\)) and boundaries (\(\pm 0.98\)) are computed once by running Lloyd's algorithm on the known Gaussian density. They never change.</p>
+        </div>
+
+        <div class="example-worked">
+            <h4>Example: What PolarQuant actually precomputes</h4>
+
+            <p>In TurboQuant, after rotation, each coordinate follows approximately \(\mathcal{N}(0, 1/d)\). Rescaling by \(\|\mathbf{x}\|\), the distribution is known. PolarQuant precomputes a Lloyd-Max quantizer for this distribution at each bitwidth.</p>
+
+            <p>For a 3-bit quantizer (\(2^3 = 8\) levels) on a standard Gaussian, the precomputed table looks roughly like:</p>
+
+            <figure><div class="diagram">
+  Level   Interval             Representative    Probability
+  -----   --------             --------------    -----------
+    0     (-&#8734;, -1.748)          -2.152             3.6%
+    1     [-1.748, -1.050)      -1.344             6.4%
+    2     [-1.050, -0.501)      -0.756            12.7%
+    3     [-0.501,  0)          -0.245            19.2%
+    4     [ 0,     +0.501)      +0.245            19.2%
+    5     [+0.501, +1.050)      +0.756            12.7%
+    6     [+1.050, +1.748)      +1.344             6.4%
+    7     [+1.748, +&#8734;)          +2.152             3.6%
+            </div></figure>
+
+            <p>At runtime, quantizing one coordinate means: compare it against 7 boundaries, pick the matching interval, store a 3-bit index (0&ndash;7). Dequantizing means: look up the representative from a table of 8 values. No floating-point arithmetic, no per-vector statistics, no calibration. The boundaries and representatives are baked in at compile time.</p>
+
+            <p>This is what makes TurboQuant fast: the entire quantization step is 7 comparisons and a table index per coordinate.</p>
+        </div>
+
+        <h3>Eliminating normalization overhead</h3>
+
+        <p>A subtle but important advantage: traditional quantization schemes (like min-max or absmax) need to store per-block scale factors, typically adding 1&ndash;2 extra bits per coordinate of overhead. PolarQuant eliminates this entirely. Since the distribution after rotation is fixed, the quantizer boundaries are fixed. No per-vector metadata is needed.</p>
+
+        <p>The only thing we need to store alongside the quantized coordinates is \(\|\mathbf{x}\|\) (a single scalar per vector) to reconstruct the scale. This is negligible overhead.</p>
+
+        <!-- ===== STAGE 2: QJL ===== -->
+        <h2>Stage 2: QJL &mdash; Fixing the Bias with One Bit</h2>
+
+        <p>Stage 1 gives us excellent MSE. But there's a problem that MSE doesn't capture.</p>
+
+        <p>In attention, we don't care about reconstructing the vector itself &mdash; we care about <strong>inner products</strong>. The attention score between a query \(\mathbf{q}\) and a key \(\mathbf{k}\) is \(\langle \mathbf{q}, \mathbf{k} \rangle\). If we quantize \(\mathbf{k}\) to \(\hat{\mathbf{k}}\), we need \(\langle \mathbf{q}, \hat{\mathbf{k}} \rangle \approx \langle \mathbf{q}, \mathbf{k} \rangle\).</p>
+
+        <p>The problem is that MSE-optimal quantizers introduce <strong>systematic bias</strong> in inner product estimates. The quantization error \(\mathbf{e} = \mathbf{k} - \hat{\mathbf{k}}\) is correlated with \(\hat{\mathbf{k}}\), which means:</p>
+
+        $$\mathbb{E}[\langle \mathbf{q}, \hat{\mathbf{k}} \rangle] \neq \langle \mathbf{q}, \mathbf{k} \rangle$$
+
+        <p>This bias accumulates across tokens in the attention softmax, silently degrading output quality. TurboQuant fixes this with a 1-bit correction based on the <strong>Johnson-Lindenstrauss lemma</strong>.</p>
+
+        <h3>The Johnson-Lindenstrauss Lemma</h3>
+
+        <p>The JL lemma (1984) is one of the most useful results in high-dimensional geometry. It says:</p>
+
+        <div class="key-idea">
+            <strong>JL Lemma:</strong> For any set of \(n\) points in \(\mathbb{R}^d\), there exists a linear map \(A: \mathbb{R}^d \to \mathbb{R}^k\) with \(k = O(\log n / \varepsilon^2)\) that preserves all pairwise distances within a factor of \((1 \pm \varepsilon)\). Moreover, a random Gaussian matrix works with high probability.
+        </div>
+
+        <p>In other words: random projections preserve geometry, even when you're projecting into a much lower-dimensional space.</p>
+
+        <h3>How QJL corrects the bias</h3>
+
+        <p>Let \(\mathbf{e} = \mathbf{k} - \hat{\mathbf{k}}\) be the residual error from Stage 1. We want to estimate \(\langle \mathbf{q}, \mathbf{e} \rangle\) &mdash; the part of the inner product lost to quantization &mdash; so we can add it back. But we can't store \(\mathbf{e}\) itself (that would defeat the purpose of compression). QJL stores a 1-bit sketch of \(\mathbf{e}\) instead.</p>
+
+        <h3>Step 1: Storing the sketch (1 bit per projection)</h3>
+
+        <p>Fix \(m\) random Gaussian vectors \(\mathbf{g}_1, \ldots, \mathbf{g}_m \in \mathbb{R}^d\), drawn once and shared across all keys. For each key's residual \(\mathbf{e}\), store:</p>
+
+        $$s_i = \operatorname{sign}(\langle \mathbf{g}_i, \mathbf{e} \rangle) \in \{-1, +1\} \quad \text{for } i = 1, \ldots, m$$
+
+        <p>Each \(s_i\) is a single bit. The inner product \(\langle \mathbf{g}_i, \mathbf{e} \rangle\) is a real number, but we only keep its sign. This feels like throwing away almost all the information &mdash; how can a sign bit help estimate an inner product?</p>
+
+        <h3>Step 2: Where \(\pi\) comes from &mdash; the sign-angle identity</h3>
+
+        <p>The key mathematical fact is a classical result about Gaussian random projections. For any two fixed vectors \(\mathbf{a}, \mathbf{b} \in \mathbb{R}^d\) and a random Gaussian vector \(\mathbf{g} \sim \mathcal{N}(\mathbf{0}, I_d)\):</p>
+
+        $$\mathbb{E}\big[\operatorname{sign}(\langle \mathbf{g}, \mathbf{a} \rangle) \cdot \langle \mathbf{g}, \mathbf{b} \rangle\big] = \sqrt{\frac{2}{\pi}} \, \|\mathbf{a}\| \cos\theta$$
+
+        <p>Wait &mdash; let me derive this from scratch so the \(\pi\) doesn't feel like magic.</p>
+
+        <p>Consider the simpler 1D case first. Let \(g \sim \mathcal{N}(0,1)\). What is \(\mathbb{E}[\operatorname{sign}(g) \cdot g]\)?</p>
+
+        $$\mathbb{E}[\operatorname{sign}(g) \cdot g] = \mathbb{E}[|g|] = \int_{-\infty}^{\infty} |g| \cdot \frac{1}{\sqrt{2\pi}} e^{-g^2/2} \, dg = 2 \int_{0}^{\infty} g \cdot \frac{1}{\sqrt{2\pi}} e^{-g^2/2} \, dg$$
+
+        <p>The integral \(\int_0^\infty g \, e^{-g^2/2} \, dg = 1\) (substitute \(u = g^2/2\)), so:</p>
+
+        $$\mathbb{E}[|g|] = \frac{2}{\sqrt{2\pi}} = \sqrt{\frac{2}{\pi}}$$
+
+        <p><strong>That's where the \(\sqrt{2/\pi}\) comes from</strong> &mdash; it's the mean of the half-normal distribution. It arises because we're taking the absolute value (or equivalently, multiplying by the sign) of a Gaussian.</p>
+
+        <p>Now generalize to \(\mathbb{R}^d\). Let \(\mathbf{g} \sim \mathcal{N}(\mathbf{0}, I_d)\), and let \(\theta\) be the angle between fixed vectors \(\mathbf{e}\) and \(\mathbf{q}\). We can decompose \(\mathbf{g}\) into a component along \(\mathbf{e}\) and a component perpendicular to \(\mathbf{e}\). The projection \(\langle \mathbf{g}, \mathbf{e} \rangle / \|\mathbf{e}\|\) is a scalar Gaussian, and the sign of \(\langle \mathbf{g}, \mathbf{e} \rangle\) depends only on this component. Meanwhile, \(\langle \mathbf{g}, \mathbf{q} \rangle\) decomposes as:</p>
+
+        $$\langle \mathbf{g}, \mathbf{q} \rangle = \underbrace{\langle \mathbf{g}, \mathbf{q}_\parallel \rangle}_{\text{component along } \mathbf{e}} + \underbrace{\langle \mathbf{g}, \mathbf{q}_\perp \rangle}_{\text{component } \perp \text{ to } \mathbf{e}}$$
+
+        <p>where \(\mathbf{q}_\parallel = \frac{\langle \mathbf{q}, \mathbf{e} \rangle}{\|\mathbf{e}\|^2} \mathbf{e}\) is the projection of \(\mathbf{q}\) onto \(\mathbf{e}\), and \(\mathbf{q}_\perp = \mathbf{q} - \mathbf{q}_\parallel\).</p>
+
+        <p>The perpendicular part \(\langle \mathbf{g}, \mathbf{q}_\perp \rangle\) is independent of \(\operatorname{sign}(\langle \mathbf{g}, \mathbf{e} \rangle)\) (because \(\mathbf{q}_\perp\) is orthogonal to \(\mathbf{e}\), so this projection involves different Gaussian components). Therefore its contribution vanishes in expectation:</p>
+
+        $$\mathbb{E}\big[\operatorname{sign}(\langle \mathbf{g}, \mathbf{e} \rangle) \cdot \langle \mathbf{g}, \mathbf{q}_\perp \rangle\big] = 0$$
+
+        <p>For the parallel part, let \(\alpha = \langle \mathbf{g}, \mathbf{e} \rangle / \|\mathbf{e}\|\) (a standard Gaussian scalar). Then:</p>
+
+        $$\langle \mathbf{g}, \mathbf{q}_\parallel \rangle = \frac{\langle \mathbf{q}, \mathbf{e} \rangle}{\|\mathbf{e}\|} \cdot \alpha$$
+
+        <p>and:</p>
+
+        $$\mathbb{E}\big[\operatorname{sign}(\langle \mathbf{g}, \mathbf{e} \rangle) \cdot \langle \mathbf{g}, \mathbf{q}_\parallel \rangle\big] = \frac{\langle \mathbf{q}, \mathbf{e} \rangle}{\|\mathbf{e}\|} \cdot \mathbb{E}[\operatorname{sign}(\alpha) \cdot \alpha] = \frac{\langle \mathbf{q}, \mathbf{e} \rangle}{\|\mathbf{e}\|} \cdot \sqrt{\frac{2}{\pi}}$$
+
+        <p>Combining the parallel and perpendicular parts:</p>
+
+        <div class="key-idea">
+            <strong>The sign-projection identity:</strong>
+            $$\mathbb{E}\big[\operatorname{sign}(\langle \mathbf{g}, \mathbf{e} \rangle) \cdot \langle \mathbf{g}, \mathbf{q} \rangle\big] = \sqrt{\frac{2}{\pi}} \cdot \frac{\langle \mathbf{q}, \mathbf{e} \rangle}{\|\mathbf{e}\|}$$
+            This holds for any fixed \(\mathbf{e}, \mathbf{q}\) and random \(\mathbf{g} \sim \mathcal{N}(\mathbf{0}, I)\). The \(\sqrt{2/\pi}\) is the mean absolute value of a standard Gaussian.
+        </div>
+
+        <h3>Step 3: Building the unbiased estimator</h3>
+
+        <p>The identity above tells us that \(\operatorname{sign}(\langle \mathbf{g}, \mathbf{e} \rangle) \cdot \langle \mathbf{g}, \mathbf{q} \rangle\) has expected value proportional to \(\langle \mathbf{q}, \mathbf{e} \rangle\), but scaled by a factor of \(\sqrt{2/\pi} / \|\mathbf{e}\|\). To get an unbiased estimator of \(\langle \mathbf{q}, \mathbf{e} \rangle\) itself, we need to undo this scaling.</p>
+
+        <p>If we knew \(\|\mathbf{e}\|\), the estimator from a single projection would be:</p>
+
+        $$\hat{T}_i = \sqrt{\frac{\pi}{2}} \cdot \|\mathbf{e}\| \cdot s_i \cdot \langle \mathbf{g}_i, \mathbf{q} \rangle$$
+
+        <p>and by the identity: \(\mathbb{E}[\hat{T}_i] = \sqrt{\frac{\pi}{2}} \cdot \|\mathbf{e}\| \cdot \sqrt{\frac{2}{\pi}} \cdot \frac{\langle \mathbf{q}, \mathbf{e} \rangle}{\|\mathbf{e}\|} = \langle \mathbf{q}, \mathbf{e} \rangle\). Unbiased.</p>
+
+        <p>In practice, TurboQuant stores \(\|\mathbf{e}\|\) alongside the sketch (it's a single scalar per vector, negligible overhead). Averaging over \(m\) independent projections reduces variance:</p>
+
+        $$\widehat{\langle \mathbf{q}, \mathbf{e} \rangle} = \frac{1}{m} \sum_{i=1}^{m} \sqrt{\frac{\pi}{2}} \cdot \|\mathbf{e}\| \cdot s_i \cdot \langle \mathbf{g}_i, \mathbf{q} \rangle$$
+
+        <p>This is sometimes written more compactly as \(\frac{\pi}{2m} \sum s_i \langle \mathbf{g}_i, \mathbf{q} \rangle\) (absorbing \(\|\mathbf{e}\|\) into the normalization of \(\mathbf{g}_i\)), which is the formula you see in the paper.</p>
+
+        <h3>Step 4: Proving unbiasedness explicitly</h3>
+
+        <p>Let's verify this end to end. The estimator for the full inner product is:</p>
+
+        $$\widehat{\langle \mathbf{q}, \mathbf{k} \rangle} = \underbrace{\langle \mathbf{q}, \hat{\mathbf{k}} \rangle}_{\text{from Stage 1}} + \underbrace{\widehat{\langle \mathbf{q}, \mathbf{e} \rangle}}_{\text{QJL correction}}$$
+
+        <p>Taking expectations (over the randomness of the Gaussian vectors \(\mathbf{g}_i\)):</p>
+
+        $$\mathbb{E}\big[\widehat{\langle \mathbf{q}, \mathbf{k} \rangle}\big] = \langle \mathbf{q}, \hat{\mathbf{k}} \rangle + \mathbb{E}\big[\widehat{\langle \mathbf{q}, \mathbf{e} \rangle}\big] = \langle \mathbf{q}, \hat{\mathbf{k}} \rangle + \langle \mathbf{q}, \mathbf{e} \rangle$$
+
+        <p>Now use \(\mathbf{e} = \mathbf{k} - \hat{\mathbf{k}}\):</p>
+
+        $$= \langle \mathbf{q}, \hat{\mathbf{k}} \rangle + \langle \mathbf{q}, \mathbf{k} - \hat{\mathbf{k}} \rangle = \langle \mathbf{q}, \hat{\mathbf{k}} \rangle + \langle \mathbf{q}, \mathbf{k} \rangle - \langle \mathbf{q}, \hat{\mathbf{k}} \rangle = \langle \mathbf{q}, \mathbf{k} \rangle$$
+
+        <p>The \(\langle \mathbf{q}, \hat{\mathbf{k}} \rangle\) terms cancel perfectly. The estimator recovers the true inner product in expectation, regardless of how large the quantization error \(\mathbf{e}\) is.</p>
+
+        <h3>Step 5: A concrete numerical example</h3>
+
+        <div class="example-worked">
+            <h4>Example: QJL correction in 2D</h4>
+            <p>Let's trace through this with small numbers to see it working.</p>
+
+            <p><strong>Setup:</strong> Dimension \(d = 2\). Suppose:</p>
+            <ul>
+                <li>True key: \(\mathbf{k} = (3.0, \; 4.0)\)</li>
+                <li>Quantized key: \(\hat{\mathbf{k}} = (2.5, \; 4.5)\) (Stage 1 output)</li>
+                <li>Residual: \(\mathbf{e} = \mathbf{k} - \hat{\mathbf{k}} = (0.5, \; -0.5)\)</li>
+                <li>Query: \(\mathbf{q} = (1.0, \; 2.0)\)</li>
+            </ul>
+
+            <p><strong>True inner product:</strong> \(\langle \mathbf{q}, \mathbf{k} \rangle = 1 \cdot 3 + 2 \cdot 4 = 11.0\)</p>
+            <p><strong>Naive (Stage 1 only):</strong> \(\langle \mathbf{q}, \hat{\mathbf{k}} \rangle = 1 \cdot 2.5 + 2 \cdot 4.5 = 11.5\)</p>
+            <p><strong>Error without correction:</strong> \(11.5 - 11.0 = 0.5\) (this is the bias)</p>
+            <p><strong>Lost inner product:</strong> \(\langle \mathbf{q}, \mathbf{e} \rangle = 1 \cdot 0.5 + 2 \cdot (-0.5) = -0.5\)</p>
+
+            <p><strong>QJL correction with \(m = 3\) projections:</strong></p>
+            <p>Draw 3 random Gaussian vectors and compute the sketch:</p>
+            <ul>
+                <li>\(\mathbf{g}_1 = (0.8, \; -0.3)\): \(\langle \mathbf{g}_1, \mathbf{e} \rangle = 0.4 + 0.15 = 0.55\), so \(s_1 = +1\)</li>
+                <li>\(\mathbf{g}_2 = (-1.2, \; 0.7)\): \(\langle \mathbf{g}_2, \mathbf{e} \rangle = -0.6 - 0.35 = -0.95\), so \(s_2 = -1\)</li>
+                <li>\(\mathbf{g}_3 = (0.1, \; 1.5)\): \(\langle \mathbf{g}_3, \mathbf{e} \rangle = 0.05 - 0.75 = -0.70\), so \(s_3 = -1\)</li>
+            </ul>
+
+            <p>Store only: \(s_1 = +1, \; s_2 = -1, \; s_3 = -1\) and \(\|\mathbf{e}\| = \sqrt{0.25 + 0.25} = \frac{1}{\sqrt{2}} \approx 0.707\).</p>
+
+            <p>At query time, compute \(\langle \mathbf{g}_i, \mathbf{q} \rangle\) for each:</p>
+            <ul>
+                <li>\(\langle \mathbf{g}_1, \mathbf{q} \rangle = 0.8 + (-0.6) = 0.2\)</li>
+                <li>\(\langle \mathbf{g}_2, \mathbf{q} \rangle = -1.2 + 1.4 = 0.2\)</li>
+                <li>\(\langle \mathbf{g}_3, \mathbf{q} \rangle = 0.1 + 3.0 = 3.1\)</li>
+            </ul>
+
+            <p>QJL estimate of \(\langle \mathbf{q}, \mathbf{e} \rangle\):</p>
+            $$\widehat{\langle \mathbf{q}, \mathbf{e} \rangle} = \frac{\sqrt{\pi/2} \cdot \|\mathbf{e}\|}{m} \sum_{i} s_i \langle \mathbf{g}_i, \mathbf{q} \rangle = \frac{1.253 \cdot 0.707}{3} \big[(+1)(0.2) + (-1)(0.2) + (-1)(3.1)\big]$$
+            $$= \frac{0.886}{3} \cdot (0.2 - 0.2 - 3.1) = 0.295 \times (-3.1) = -0.915$$
+
+            <p><strong>Corrected estimate:</strong> \(11.5 + (-0.915) = 10.585\)</p>
+            <p><strong>True value:</strong> \(11.0\)</p>
+
+            <p>The correction moved us from an error of \(+0.5\) to an error of \(-0.415\). On this single draw, the correction overshot &mdash; but that's because \(m = 3\) is very small and we got unlucky with \(\mathbf{g}_3\). <strong>In expectation</strong> (averaged over many random draws of the \(\mathbf{g}_i\)), the estimate would be exactly 11.0. With a realistic \(m\) (say 64 or 128, matching the head dimension), the variance shrinks dramatically and the estimate would be very close to 11.0 on any single draw.</p>
+        </div>
+
+        <h3>Step 6: Why the two stages complement each other</h3>
+
+        <p>Now we can see precisely how the two stages work together:</p>
+
+        <ul>
+            <li><strong>Stage 1 (PolarQuant)</strong> makes \(\|\mathbf{e}\|\) small. The better the Lloyd-Max quantizer, the smaller the residual. This directly reduces the <em>variance</em> of the QJL estimator (which scales with \(\|\mathbf{e}\|^2\)).</li>
+            <li><strong>Stage 2 (QJL)</strong> makes the estimate unbiased. No matter how large or small \(\mathbf{e}\) is, the correction recovers the true inner product in expectation.</li>
+        </ul>
+
+        <p>Without Stage 1, the residual would be large and the QJL estimator would have high variance. Without Stage 2, the quantized inner product would have low variance but persistent bias. Together: low variance <em>and</em> zero bias.</p>
+
+        <p>The total inner product estimate is:</p>
+        $$\langle \mathbf{q}, \mathbf{k} \rangle \;\approx\; \langle \mathbf{q}, \hat{\mathbf{k}} \rangle \;+\; \frac{1}{m}\sum_{i=1}^{m} \sqrt{\frac{\pi}{2}} \cdot \|\mathbf{e}\| \cdot s_i \cdot \langle \mathbf{g}_i, \mathbf{q} \rangle$$
+
+        <!-- ===== PUTTING IT TOGETHER ===== -->
+        <h2>The Full TurboQuant Pipeline</h2>
+
+        <figure>
+            <div class="diagram">
+Input vector x &#8712; &#8477;&#x1D48;
+        |
+        v
+  [Random Rotation]     x&#771; = Qx
+        |
+        v
+  [Lloyd-Max Quantize]  x&#770; = decode(quantize(x&#771;))  ... b bits/coord
+        |
+        v
+  [Compute Residual]    e = x&#771; - x&#770;
+        |
+        v
+  [QJL 1-bit Sketch]    s&#7522; = sign(&#10216;g&#7522;, e&#10217;)    ... 1 bit/coord
+        |
+        v
+  Store: b-bit codes + 1-bit sketch + &#8741;x&#8741;
+
+At query time:
+  &#10216;q, k&#10217; &#8776; &#10216;q, k&#770;&#10217; + (&#960;/2m) &#931; s&#7522; &#183; &#10216;g&#7522;, q&#10217;
+            </div>
+            <figcaption>TurboQuant compresses each KV vector in two stages: rotation + scalar quantization (PolarQuant), then 1-bit residual correction (QJL).</figcaption>
+        </figure>
+
+        <p>The total storage per coordinate is \(b + 1\) bits (e.g., 3 bits PolarQuant + 1 bit QJL = 4 bits total, compared to 16 bits for FP16). This gives the 4&ndash;6x memory reduction.</p>
+
+        <!-- ===== THEORETICAL GUARANTEES ===== -->
+        <h2>How Good Is This? The Information-Theoretic Limit</h2>
+
+        <p>Now for the punchline. How close is TurboQuant to the best possible?</p>
+
+        <p>Shannon's <strong>rate-distortion theory</strong> provides a hard lower bound: for any \(b\)-bit quantizer operating on unit-norm vectors in \(\mathbb{R}^d\), the minimum achievable MSE scales as:</p>
+
+        $$\operatorname{MSE}_{\min} \;\geq\; C \cdot 4^{-b}$$
+
+        <p>for some constant \(C\). No quantizer &mdash; no matter how clever, how much data it sees, or how much computation it uses &mdash; can beat this bound.</p>
+
+        <p>The TurboQuant paper (Theorem 3 in <a href="https://arxiv.org/abs/2504.19874" target="_blank">arXiv:2504.19874</a>) proves that TurboQuant achieves:</p>
+
+        $$\operatorname{MSE}_{\mathrm{TurboQuant}} \;\leq\; \frac{\sqrt{3\pi}}{2} \cdot 4^{-b} \;\approx\; 2.7 \cdot 4^{-b}$$
+
+        <div class="result-box">
+            <p>TurboQuant is within a factor of <strong>~2.7</strong> of the information-theoretic limit at every bitwidth.</p>
+            <p>This factor is constant &mdash; it does not grow with \(d\) or \(b\).</p>
+        </div>
+
+        <p>To put this in perspective: no future algorithm can improve on TurboQuant by more than 2.7x in MSE, regardless of approach. The remaining gap is between the Lloyd-Max scalar quantizer (optimal for scalar quantization of a known distribution) and the Shannon bound for full vector quantization (which requires exponential codebook searches in theory).</p>
+
+        <h3>Inner product guarantee</h3>
+
+        <p>For the inner product estimator (which is what attention actually uses), TurboQuant provides:</p>
+        <ul>
+            <li><strong>Unbiased:</strong> \(\mathbb{E}[\langle \mathbf{q}, \hat{\mathbf{k}} \rangle_{\mathrm{TQ}}] = \langle \mathbf{q}, \mathbf{k} \rangle\)</li>
+            <li><strong>Variance bound:</strong> \(\operatorname{Var}[\langle \mathbf{q}, \hat{\mathbf{k}} \rangle_{\mathrm{TQ}}] \leq \frac{\sqrt{3\pi}}{2} \cdot \frac{\|\mathbf{q}\|^2}{d} \cdot 4^{-b}\)</li>
+        </ul>
+
+        <p>The variance shrinks exponentially with the bit budget and inversely with the dimension. For typical LLM head dimensions (\(d = 128\)) and 3&ndash;4 bit quantization, this variance is tiny.</p>
+
+        <!-- ===== PRACTICAL RESULTS ===== -->
+        <h2>What This Looks Like in Practice</h2>
+
+        <table class="comparison-table">
+            <tr>
+                <th>Configuration</th>
+                <th>Bits per value</th>
+                <th>KV cache size (Llama 70B, 128K ctx)</th>
+                <th>Quality</th>
+            </tr>
+            <tr>
+                <td>FP16 (baseline)</td>
+                <td>16</td>
+                <td>~40 GB</td>
+                <td>Full</td>
+            </tr>
+            <tr>
+                <td>TurboQuant 4-bit</td>
+                <td>4</td>
+                <td>~10 GB</td>
+                <td>Matches FP16</td>
+            </tr>
+            <tr>
+                <td>TurboQuant 3.5-bit</td>
+                <td>3.5</td>
+                <td>~8.75 GB</td>
+                <td>Quality-neutral</td>
+            </tr>
+            <tr>
+                <td>TurboQuant 3-bit</td>
+                <td>3</td>
+                <td>~7.5 GB</td>
+                <td>Near quality-neutral</td>
+            </tr>
+            <tr>
+                <td>TurboQuant 2.5-bit</td>
+                <td>2.5</td>
+                <td>~6.25 GB</td>
+                <td>Marginal degradation</td>
+            </tr>
+        </table>
+
+        <p>At 4-bit precision, TurboQuant also delivers up to 8x speedup for attention logit computation on H100 GPUs, since lower-precision arithmetic is faster.</p>
+
+        <p>When benchmarked on long-context tasks (LongBench, Needle-in-a-Haystack, RULER), 3.5-bit TurboQuant is statistically indistinguishable from FP16. The algorithm achieves this without any training, fine-tuning, or calibration data.</p>
+
+        <!-- ===== THE DEEPER PUZZLE ===== -->
+        <h2>The Deeper Puzzle: Why Is This So Close to Optimal?</h2>
+
+        <p>The factor of 2.7 deserves a closer look. Where does it come from, and why can't we close the gap?</p>
+
+        <p>The gap exists because TurboQuant uses <strong>scalar quantization</strong> (quantizing each coordinate independently) rather than <strong>vector quantization</strong> (quantizing all coordinates jointly). Scalar quantization is fast &mdash; \(O(d)\) per vector &mdash; but it treats each coordinate in isolation, missing correlations between coordinates.</p>
+
+        <p>Full vector quantization could, in theory, exploit these correlations to achieve lower distortion. But it requires a codebook of size \(2^{bd}\) and search time exponential in \(d\). For \(d = 128\) and \(b = 3\), that's \(2^{384}\) codewords &mdash; a number larger than the atoms in the observable universe.</p>
+
+        <div class="puzzle-box">
+            <h3>A Question to Sit With</h3>
+            <p>The random rotation in PolarQuant makes coordinates nearly independent in high dimensions. But "nearly" isn't "exactly." There are residual correlations that the scalar quantizer ignores.</p>
+            <p>Is there a tractable quantization scheme &mdash; one that runs in polynomial time &mdash; that could exploit these residual correlations to close the 2.7x gap? Or is there a computational lower bound that says this gap is inherent for efficient algorithms?</p>
+            <p>As far as I know, this question is open.</p>
+        </div>
+
+        <!-- ===== WHY IT MATTERS ===== -->
+        <h2>Why This Matters Beyond LLMs</h2>
+
+        <p>TurboQuant is framed as a KV cache trick, but the mathematics applies to any setting where you need to store high-dimensional vectors compactly while preserving inner products:</p>
+
+        <ul>
+            <li><strong>Vector databases</strong> (Pinecone, Weaviate, etc.): similarity search at lower memory cost</li>
+            <li><strong>Embedding storage</strong>: compress sentence/image embeddings for retrieval</li>
+            <li><strong>Streaming quantization</strong>: the algorithm is online &mdash; each vector is quantized independently with no look-ahead, making it suitable for real-time applications</li>
+            <li><strong>Federated learning</strong>: compress gradient updates for communication-efficient training</li>
+        </ul>
+
+        <p>The data-oblivious property is particularly valuable: you don't need to retrain or recalibrate when the data distribution shifts.</p>
+
+        <!-- ===== WHAT'S LEFT ===== -->
+        <h2>What's Left on the Table</h2>
+
+        <p>TurboQuant is close to optimal for compressing the data as-is. But the authors note that most future gains in LLM memory efficiency will likely come from changing what data needs to be stored in the first place:</p>
+
+        <ul>
+            <li><strong>Multi-query attention / grouped-query attention:</strong> share key-value heads across query heads, reducing the number of vectors stored</li>
+            <li><strong>Sliding window attention:</strong> don't store the full context, just a recent window</li>
+            <li><strong>Architectural innovations:</strong> models designed from the start for efficient KV storage</li>
+        </ul>
+
+        <p>Compression is approaching the theoretical wall. Architecture is where the headroom is.</p>
+
+        <!-- ===== SUMMARY ===== -->
+        <h2>Summary</h2>
+
+        <p>TurboQuant combines three clean mathematical ideas:</p>
+
+        <ol>
+            <li><strong>Random rotation</strong> makes every coordinate look the same (PolarQuant insight).</li>
+            <li><strong>Lloyd-Max quantization</strong> exploits the known distribution to minimize MSE with zero calibration.</li>
+            <li><strong>1-bit JL sketch</strong> of the residual eliminates inner product bias (QJL insight).</li>
+        </ol>
+
+        <p>The result is within 2.7x of the information-theoretic limit, requires no training data, and runs fast enough for real-time inference. It's a nice example of how theoretical tools from high-dimensional geometry (JL lemma), information theory (rate-distortion bounds), and signal processing (Lloyd-Max quantization) combine to solve a practical engineering problem.</p>
+
+        <p>Paper: <a href="https://arxiv.org/abs/2504.19874" target="_blank">arXiv:2504.19874</a> &mdash; Zandieh, Daliri, Hadian, Mirrokni (2025). Accepted at ICLR 2026.</p>
+
+        <h2>Further Reading</h2>
+        <ul>
+            <li><a href="https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/" target="_blank">Google Research blog post</a> on TurboQuant</li>
+            <li><a href="https://arxiv.org/abs/2504.19874" target="_blank">TurboQuant paper</a> (arXiv:2504.19874)</li>
+            <li><a href="https://en.wikipedia.org/wiki/Johnson%E2%80%93Lindenstrauss_lemma" target="_blank">Johnson-Lindenstrauss lemma</a> (Wikipedia)</li>
+            <li><a href="https://en.wikipedia.org/wiki/Lloyd%27s_algorithm" target="_blank">Lloyd's algorithm / k-means</a> (Wikipedia)</li>
+            <li><a href="https://en.wikipedia.org/wiki/Rate%E2%80%93distortion_theory" target="_blank">Rate-distortion theory</a> (Wikipedia)</li>
+        </ul>
+        <hr class="appendix-divider">
+
+        <!-- ===== APPENDIX ===== -->
+        <h2>Appendix: Mathematical Background</h2>
+
+        <p>This blog uses several probability distributions and their interrelationships. If you're rusty on any of them, this appendix walks through each one from scratch with worked examples that connect directly to the arguments above.</p>
+
+        <!-- ===== A.1: CHI-SQUARED ===== -->
+        <h2>A.1 &mdash; The Chi-Squared Distribution</h2>
+
+        <div class="definition-box">
+            <strong>Definition.</strong>
+            If \(g_1, g_2, \ldots, g_k\) are independent standard normal random variables (\(g_i \sim \mathcal{N}(0,1)\)), then the sum of their squares
+            $$X = g_1^2 + g_2^2 + \cdots + g_k^2$$
+            follows a <strong>chi-squared distribution with \(k\) degrees of freedom</strong>, written \(X \sim \chi^2(k)\).
+        </div>
+
+        <p><strong>Key properties:</strong></p>
+        <ul>
+            <li>Mean: \(\mathbb{E}[X] = k\)</li>
+            <li>Variance: \(\operatorname{Var}(X) = 2k\)</li>
+            <li>The PDF is \(f(x) = \frac{1}{2^{k/2}\,\Gamma(k/2)} \, x^{k/2-1} \, e^{-x/2}\) for \(x > 0\).</li>
+            <li>Additive: if \(X \sim \chi^2(a)\) and \(Y \sim \chi^2(b)\) are independent, then \(X + Y \sim \chi^2(a+b)\).</li>
+        </ul>
+
+        <p><strong>Special case used in this blog:</strong> A single squared Gaussian \(g^2\) where \(g \sim \mathcal{N}(0,1)\) is \(\chi^2(1)\). Its mean is 1 and its variance is 2. This is the building block for everything that follows.</p>
+
+        <div class="example-worked">
+            <h4>Worked Example A.1: Sum of squared Gaussians</h4>
+            <p><em>Problem:</em> Let \(g_1, \ldots, g_{1000} \sim \mathcal{N}(0,1)\) independently. What is the distribution of \(S = \sum_{i=1}^{1000} g_i^2\)? What are its mean and standard deviation? How tightly is it concentrated?</p>
+
+            <p><em>Solution:</em></p>
+            <ul>
+                <li>\(S \sim \chi^2(1000)\)</li>
+                <li>\(\mathbb{E}[S] = 1000\)</li>
+                <li>\(\operatorname{Var}(S) = 2 \times 1000 = 2000\), so \(\operatorname{SD}(S) = \sqrt{2000} \approx 44.7\)</li>
+                <li>Coefficient of variation: \(\operatorname{SD}/\operatorname{Mean} = 44.7 / 1000 \approx 0.045\)</li>
+            </ul>
+
+            <p>The relative fluctuation is under 5%. This is why, in Step 5 of the puzzle solution, we could approximate \(\sqrt{\sum g_j^2} \approx \sqrt{d}\) &mdash; the sum \(\sum g_j^2\) is tightly concentrated around its mean \(d = 1000\).</p>
+        </div>
+
+        <div class="example-worked">
+            <h4>Worked Example A.2: Moments of \(\chi^2(1)\)</h4>
+            <p><em>Problem:</em> If \(X \sim \chi^2(1)\) (i.e., \(X = g^2\) for \(g \sim \mathcal{N}(0,1)\)), compute \(\mathbb{E}[X]\), \(\mathbb{E}[X^2]\), and \(\operatorname{Var}(X)\).</p>
+
+            <p><em>Solution:</em></p>
+            <ul>
+                <li>\(\mathbb{E}[X] = \mathbb{E}[g^2] = 1\) (since \(g\) has mean 0 and variance 1).</li>
+                <li>\(\mathbb{E}[X^2] = \mathbb{E}[g^4]\). For a standard normal, \(\mathbb{E}[g^4] = 3\) (this is the fourth moment, equal to \(3!! = 3 \cdot 1 = 3\)).</li>
+                <li>\(\operatorname{Var}(X) = \mathbb{E}[X^2] - (\mathbb{E}[X])^2 = 3 - 1 = 2\). This matches the general formula \(\operatorname{Var}(\chi^2(k)) = 2k\) with \(k = 1\).</li>
+            </ul>
+
+            <p>This is exactly the calculation that produces the "\(+2\)" in the \(d(d+2)\) denominator in Step 6 of the puzzle solution. The second moment of \(\chi^2(1)\) being 3 (not 1) is what creates that correction term.</p>
+        </div>
+
+        <!-- ===== A.2: BETA ===== -->
+        <h2>A.2 &mdash; The Beta Distribution</h2>
+
+        <div class="definition-box">
+            <strong>Definition.</strong>
+            A random variable \(Z\) follows a <strong>Beta distribution</strong> with parameters \(\alpha > 0\) and \(\beta > 0\), written \(Z \sim \operatorname{Beta}(\alpha, \beta)\), if it takes values in \([0, 1]\) with PDF:
+            $$f(z) = \frac{z^{\alpha-1}(1-z)^{\beta-1}}{B(\alpha, \beta)} \quad \text{for } z \in [0,1]$$
+            where \(B(\alpha, \beta) = \frac{\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha+\beta)}\) is the beta function.
+        </div>
+
+        <p><strong>Key properties:</strong></p>
+        <ul>
+            <li>Mean: \(\displaystyle\mathbb{E}[Z] = \frac{\alpha}{\alpha + \beta}\)</li>
+            <li>Variance: \(\displaystyle\operatorname{Var}(Z) = \frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}\)</li>
+            <li>Mode (for \(\alpha, \beta > 1\)): \(\displaystyle\frac{\alpha - 1}{\alpha + \beta - 2}\)</li>
+            <li>If \(\alpha = \beta\), the distribution is symmetric around \(1/2\).</li>
+            <li>If \(\alpha < 1\) and \(\beta \gg 1\), the distribution is concentrated near 0 with a right skew.</li>
+        </ul>
+
+        <p><strong>Where it appears in this blog:</strong> The squared coordinate \(u_i^2\) of a uniform random unit vector follows \(\operatorname{Beta}(1/2, (d-1)/2)\). This has \(\alpha = 1/2 < 1\), so the PDF diverges at 0 &mdash; most of the probability mass is near zero, which makes sense because each coordinate of a high-dimensional unit vector is small.</p>
+
+        <div class="connection-box">
+            <strong>Connection: Chi-squared &rarr; Beta.</strong>
+            This is the key link used in Step 3 of the puzzle solution. If \(X \sim \chi^2(a)\) and \(Y \sim \chi^2(b)\) are <strong>independent</strong>, then:
+            $$\frac{X}{X + Y} \sim \operatorname{Beta}\!\left(\frac{a}{2}, \frac{b}{2}\right)$$
+            In words: the fraction of a total chi-squared sum attributable to one part follows a Beta distribution. The proof goes through the change-of-variables formula for joint densities, transforming \((X, Y) \to (X/(X+Y),\; X+Y)\).
+        </div>
+
+        <div class="example-worked">
+            <h4>Worked Example A.3: The Beta distribution of a single coordinate</h4>
+            <p><em>Problem:</em> A uniform random unit vector \(\mathbf{u}\) on the sphere in \(\mathbb{R}^5\). What is the exact distribution of \(u_1^2\)? Compute its mean and variance.</p>
+
+            <p><em>Solution:</em> Using the Gaussian construction, \(u_1 = g_1 / \|\mathbf{g}\|\), so:</p>
+            $$u_1^2 = \frac{g_1^2}{g_1^2 + g_2^2 + g_3^2 + g_4^2 + g_5^2} = \frac{X}{X + Y}$$
+            <p>where \(X = g_1^2 \sim \chi^2(1)\) and \(Y = g_2^2 + \cdots + g_5^2 \sim \chi^2(4)\), independent of \(X\).</p>
+            <p>By the chi-squared-to-Beta connection:</p>
+            $$u_1^2 \sim \operatorname{Beta}\!\left(\frac{1}{2}, \frac{4}{2}\right) = \operatorname{Beta}\!\left(\frac{1}{2}, 2\right)$$
+            <p>Now compute moments:</p>
+            <ul>
+                <li>\(\mathbb{E}[u_1^2] = \dfrac{1/2}{1/2 + 2} = \dfrac{1/2}{5/2} = \dfrac{1}{5}\). Checks out: \(d = 5\), and by symmetry each of the 5 coordinates gets \(1/5\) of the squared norm.</li>
+                <li>\(\operatorname{Var}(u_1^2) = \dfrac{(1/2)(2)}{(5/2)^2(5/2 + 1)} = \dfrac{1}{(25/4)(7/2)} = \dfrac{1}{87.5} = \dfrac{4}{350} = \dfrac{2}{175}\)</li>
+                <li>\(\operatorname{SD}(u_1^2) = \sqrt{2/175} \approx 0.107\). The mean is \(0.2\), so the coefficient of variation is about 0.53 &mdash; substantial spread, as discussed in Step 4.</li>
+            </ul>
+        </div>
+
+        <div class="example-worked">
+            <h4>Worked Example A.4: Seeing the Gaussian approximation emerge</h4>
+            <p><em>Problem:</em> For \(d = 5\) vs. \(d = 1000\), compare the Beta distribution of \(u_1^2\) to the Gaussian approximation.</p>
+
+            <p><em>Solution:</em> The coordinate \(u_1\) (not squared) has mean 0 and variance \(1/d\). The Gaussian approximation says \(u_1 \approx \mathcal{N}(0, 1/d)\).</p>
+
+            <p>For \(d = 5\): \(u_1 \approx \mathcal{N}(0, 0.2)\). But the actual distribution of \(u_1\) has support only on \([-1, 1]\) (it's a coordinate of a unit vector), and the density has noticeable curvature at the tails. The Gaussian leaks probability outside \([-1, 1]\). The approximation is rough.</p>
+
+            <p>For \(d = 1000\): \(u_1 \approx \mathcal{N}(0, 0.001)\), so \(\operatorname{SD}(u_1) \approx 0.032\). Almost all probability mass sits in \([-0.1, 0.1]\), far from the boundary at \(\pm 1\). The tails of the Gaussian that leak outside \([-1, 1]\) have negligible mass (\(< 10^{-200}\)). The approximation is excellent.</p>
+
+            <p>This is why PolarQuant works well at LLM head dimensions (\(d = 64\) to 128) &mdash; large enough that the Gaussian approximation to the Beta is already very accurate, and the precomputed Lloyd-Max quantizer designed for this distribution performs nearly optimally.</p>
+        </div>
+
+        <!-- ===== A.3: DIRICHLET ===== -->
+        <h2>A.3 &mdash; The Dirichlet Distribution</h2>
+
+        <div class="definition-box">
+            <strong>Definition.</strong>
+            A random vector \((Z_1, Z_2, \ldots, Z_d)\) follows a <strong>Dirichlet distribution</strong> with parameters \((\alpha_1, \alpha_2, \ldots, \alpha_d)\), written \(\operatorname{Dir}(\alpha_1, \ldots, \alpha_d)\), if:
+            <ul>
+                <li>Each \(Z_i \geq 0\)</li>
+                <li>\(\sum_{i=1}^{d} Z_i = 1\) (the components live on the probability simplex)</li>
+                <li>The joint PDF is \(\displaystyle f(z_1, \ldots, z_d) = \frac{\Gamma(\alpha_1 + \cdots + \alpha_d)}{\Gamma(\alpha_1)\cdots\Gamma(\alpha_d)} \prod_{i=1}^{d} z_i^{\alpha_i - 1}\)</li>
+            </ul>
+            When all \(\alpha_i = \alpha\), this is a <strong>symmetric Dirichlet</strong> with parameter \(\alpha\).
+        </div>
+
+        <p><strong>Key properties:</strong></p>
+        <ul>
+            <li>Mean of each component: \(\displaystyle\mathbb{E}[Z_i] = \frac{\alpha_i}{\alpha_0}\) where \(\alpha_0 = \sum \alpha_j\)</li>
+            <li>Variance: \(\displaystyle\operatorname{Var}(Z_i) = \frac{\alpha_i(\alpha_0 - \alpha_i)}{\alpha_0^2(\alpha_0 + 1)}\)</li>
+            <li>Covariance (for \(i \neq j\)): \(\displaystyle\operatorname{Cov}(Z_i, Z_j) = \frac{-\alpha_i \alpha_j}{\alpha_0^2(\alpha_0 + 1)}\)</li>
+            <li>Each marginal is Beta: \(Z_i \sim \operatorname{Beta}(\alpha_i, \alpha_0 - \alpha_i)\)</li>
+        </ul>
+
+        <div class="connection-box">
+            <strong>Connection: Chi-squared &rarr; Dirichlet &rarr; Beta.</strong>
+            If \(X_1, \ldots, X_d\) are independent with \(X_i \sim \chi^2(2\alpha_i)\), and \(S = \sum X_i\), then:
+            $$\left(\frac{X_1}{S}, \frac{X_2}{S}, \ldots, \frac{X_d}{S}\right) \sim \operatorname{Dir}(\alpha_1, \ldots, \alpha_d)$$
+            The Beta distribution is the special case \(d = 2\): splitting a total into two parts gives a single ratio that's Beta. The Dirichlet generalizes this to splitting a total into \(d\) parts simultaneously.
+        </div>
+
+        <p><strong>Where it appears in this blog:</strong> The vector of squared coordinates \((u_1^2, u_2^2, \ldots, u_d^2)\) of a uniform random unit vector follows:</p>
+        $$\operatorname{Dir}\!\left(\frac{1}{2}, \frac{1}{2}, \ldots, \frac{1}{2}\right) \quad \text{(symmetric Dirichlet with } \alpha = 1/2 \text{)}$$
+        <p>This is because \(u_i^2 = g_i^2 / \sum g_k^2\), and each \(g_i^2 \sim \chi^2(1)\), and \(\chi^2(1) = \chi^2(2 \times 1/2)\), so the construction above applies with \(\alpha_i = 1/2\) for all \(i\).</p>
+
+        <div class="example-worked">
+            <h4>Worked Example A.5: Dirichlet moments and the \(d(d+2)\) formula</h4>
+            <p><em>Problem:</em> For \((Z_1, \ldots, Z_d) \sim \operatorname{Dir}(1/2, \ldots, 1/2)\) (the distribution of squared coordinates of a random unit vector), compute \(\mathbb{E}[Z_i Z_j]\) for \(i \neq j\).</p>
+
+            <p><em>Solution:</em> We use the general Dirichlet second moment formula. For a Dirichlet with parameters \((\alpha_1, \ldots, \alpha_d)\) and \(\alpha_0 = \sum \alpha_k\):</p>
+            $$\mathbb{E}[Z_i Z_j] = \frac{\alpha_i \alpha_j}{\alpha_0(\alpha_0 + 1)} \quad \text{for } i \neq j$$
+
+            <p>Let's derive this. We have:</p>
+            $$\mathbb{E}[Z_i Z_j] = \mathbb{E}[Z_i \, \mathbb{E}[Z_j \mid Z_i]]$$
+
+            <p>But it's easier to go through the chi-squared construction. Let \(X_k \sim \chi^2(2\alpha_k)\) independently, \(S = \sum X_k\), and \(Z_k = X_k/S\). Then:</p>
+            $$\mathbb{E}[Z_i Z_j] = \mathbb{E}\!\left[\frac{X_i X_j}{S^2}\right]$$
+
+            <p>Since \(X_i\) and \(X_j\) are independent of each other (and of the rest), we can condition on \(S\). But actually, the cleanest approach uses the identity: for independent Gamma variables \(X_i \sim \text{Gamma}(\alpha_i, 1)\), with \(S = \sum X_k\):</p>
+            $$\mathbb{E}\!\left[\frac{X_i X_j}{S^2}\right] = \frac{\mathbb{E}[X_i]\,\mathbb{E}[X_j]}{\mathbb{E}[S]\,(\mathbb{E}[S]+1)} = \frac{\alpha_i \, \alpha_j}{\alpha_0(\alpha_0+1)}$$
+
+            <p>(This identity follows from the fact that \(Z_i\) is independent of \(S\) &mdash; a defining property of the Dirichlet &mdash; and from the formula for \(\mathbb{E}[1/S]\) for a Gamma sum.)</p>
+
+            <p>In our case, \(\alpha_i = \alpha_j = 1/2\) and \(\alpha_0 = d/2\), so:</p>
+
+            $$\mathbb{E}[Z_i Z_j] = \frac{(1/2)(1/2)}{(d/2)(d/2 + 1)} = \frac{1/4}{(d/2)\cdot(d+2)/2} = \frac{1/4}{d(d+2)/4} = \frac{1}{d(d+2)}$$
+
+            <p>That's the \(1/d(d+2)\) from Step 6. Now the covariance:</p>
+            $$\operatorname{Cov}(Z_i, Z_j) = \mathbb{E}[Z_i Z_j] - \mathbb{E}[Z_i]\mathbb{E}[Z_j] = \frac{1}{d(d+2)} - \frac{1}{d} \cdot \frac{1}{d} = \frac{1}{d(d+2)} - \frac{1}{d^2}$$
+            $$= \frac{d - (d+2)}{d^2(d+2)} = \frac{-2}{d^2(d+2)}$$
+
+            <p>For \(d = 1000\): \(\operatorname{Cov}(Z_i, Z_j) = -2/(1000^2 \cdot 1002) \approx -2.0 \times 10^{-9}\). Tiny.</p>
+        </div>
+
+        <div class="example-worked">
+            <h4>Worked Example A.6: Checking the Dirichlet formula numerically</h4>
+            <p><em>Problem:</em> Verify the formula \(\mathbb{E}[Z_i Z_j] = 1/d(d+2)\) for \(d = 3\) by computing it from the chi-squared definition.</p>
+
+            <p><em>Solution:</em> The formula predicts \(\mathbb{E}[Z_1 Z_2] = 1/(3 \times 5) = 1/15\).</p>
+
+            <p>Let's check with the Dirichlet moment formula directly. For \(\operatorname{Dir}(1/2, 1/2, 1/2)\), the general cross-moment is:</p>
+
+            $$\mathbb{E}\!\left[\prod Z_i^{n_i}\right] = \frac{B(\alpha_1+n_1, \ldots, \alpha_d+n_d)}{B(\alpha_1, \ldots, \alpha_d)}$$
+
+            <p>where \(B\) is the multivariate beta function. With \(n_1 = 1, n_2 = 1, n_3 = 0\):</p>
+
+            $$\mathbb{E}[Z_1 Z_2] = \frac{\Gamma(1/2 + 1)\Gamma(1/2 + 1)\Gamma(1/2)}{\Gamma(3/2 + 2)} \cdot \frac{\Gamma(3/2)}{\Gamma(1/2)\Gamma(1/2)\Gamma(1/2)}$$
+
+            <p>Using \(\Gamma(1/2) = \sqrt{\pi}\), \(\Gamma(3/2) = \frac{1}{2}\sqrt{\pi}\), \(\Gamma(5/2) = \frac{3}{4}\sqrt{\pi}\), \(\Gamma(7/2) = \frac{15}{8}\sqrt{\pi}\):</p>
+
+            $$= \frac{(\frac{1}{2}\sqrt{\pi})(\frac{1}{2}\sqrt{\pi})(\sqrt{\pi})}{(\frac{15}{8}\sqrt{\pi})} \cdot \frac{(\frac{1}{2}\sqrt{\pi})}{(\sqrt{\pi})(\sqrt{\pi})(\sqrt{\pi})} = \frac{\frac{1}{4}\pi\sqrt{\pi}}{\frac{15}{8}\sqrt{\pi}} \cdot \frac{1}{2\pi} = \frac{\frac{1}{4}}{\frac{15}{8}} \cdot \frac{1}{2} = \frac{2}{15} \cdot \frac{1}{2} = \frac{1}{15}$$
+
+            <p>Matches \(1/d(d+2) = 1/15\).</p>
+        </div>
+
+        <!-- ===== A.4: HOW THEY RELATE ===== -->
+        <h2>A.4 &mdash; The Family Tree: How They All Connect</h2>
+
+        <p>Here is how the three distributions relate, in the order that matters for this blog:</p>
+
+        <div class="stage-box">
+            <p><strong>Level 0: Gaussian.</strong> Start with independent \(g_1, \ldots, g_d \sim \mathcal{N}(0,1)\).</p>
+
+            <p><strong>Level 1: Chi-squared.</strong> Square them: each \(g_i^2 \sim \chi^2(1)\). Sum \(k\) of them: \(\sum_{i=1}^{k} g_i^2 \sim \chi^2(k)\).</p>
+
+            <p><strong>Level 2: Beta.</strong> Take the ratio of one part to the whole: \(\dfrac{g_i^2}{\sum_{j=1}^d g_j^2} \sim \operatorname{Beta}(1/2, (d-1)/2)\). This is a single squared coordinate of a random unit vector.</p>
+
+            <p><strong>Level 3: Dirichlet.</strong> Take all such ratios jointly: \(\left(\dfrac{g_1^2}{\sum g_j^2}, \ldots, \dfrac{g_d^2}{\sum g_j^2}\right) \sim \operatorname{Dir}(1/2, \ldots, 1/2)\). This is the full vector of squared coordinates. Each marginal is Beta (Level 2), but the Dirichlet captures the joint structure &mdash; including the constraint that they sum to 1, which is what creates the small negative covariances in Step 6.</p>
+        </div>
+
+        <figure>
+            <div class="diagram">
+                 d independent Gaussians: g&#8321;, ..., g&#8696; ~ N(0,1)
+                               |
+                               v
+               Square each: g&#8321;&#178;, ..., g&#8696;&#178; ~ &#967;&#178;(1) each
+                               |
+            +------------------+-------------------+
+            |                                      |
+            v                                      v
+    Sum all d:                          Normalize by sum:
+  S = &#931; g&#7522;&#178; ~ &#967;&#178;(d)              (g&#8321;&#178;/S, ..., g&#8696;&#178;/S) ~ Dir(&#189;,...,&#189;)
+                                                   |
+                                                   v
+                                        Any single ratio:
+                                     g&#7522;&#178;/S ~ Beta(&#189;, (d-1)/2)
+                                                   |
+                                                   v
+                                       Take square root:
+                                    u&#7522; = g&#7522;/&#8730;S &#8776; N(0, 1/d)
+                                   [coordinate of random unit vector]
+            </div>
+            <figcaption>The chain from Gaussians to the coordinate distribution used by PolarQuant. Each level builds on the previous.</figcaption>
+        </figure>
+
+        <div class="example-worked">
+            <h4>Worked Example A.7: Tracing through the full chain for \(d = 4\)</h4>
+            <p><em>Problem:</em> Draw \(g_1 = 1.2\), \(g_2 = -0.5\), \(g_3 = 0.8\), \(g_4 = -1.1\) from \(\mathcal{N}(0,1)\). Compute the unit vector, the Dirichlet vector, and verify the distributions.</p>
+
+            <p><em>Solution:</em></p>
+
+            <p><strong>Chi-squared level:</strong> \(g_1^2 = 1.44\), \(g_2^2 = 0.25\), \(g_3^2 = 0.64\), \(g_4^2 = 1.21\). Sum: \(S = 3.54\). (One draw from \(\chi^2(4)\); the mean of \(\chi^2(4)\) is 4, so 3.54 is a reasonable value.)</p>
+
+            <p><strong>Unit vector (take square root of S):</strong> \(\|\mathbf{g}\| = \sqrt{3.54} = 1.881\).</p>
+            $$(u_1, u_2, u_3, u_4) = \frac{1}{1.881}(1.2,\; -0.5,\; 0.8,\; -1.1) = (0.638,\; -0.266,\; 0.425,\; -0.585)$$
+            <p>Check: \(0.638^2 + 0.266^2 + 0.425^2 + 0.585^2 = 0.407 + 0.071 + 0.181 + 0.342 = 1.001 \approx 1\).</p>
+
+            <p><strong>Dirichlet level (squared coordinates):</strong></p>
+            $$(u_1^2, u_2^2, u_3^2, u_4^2) = (0.407, 0.071, 0.181, 0.342)$$
+            <p>These sum to 1 and each is in \([0,1]\) &mdash; one draw from \(\operatorname{Dir}(1/2, 1/2, 1/2, 1/2)\). The expected value of each component is \(1/d = 1/4 = 0.25\).</p>
+
+            <p><strong>Beta level (single component):</strong> \(u_1^2 = 0.407\) is one draw from \(\operatorname{Beta}(1/2, 3/2)\). The mean of this Beta is \((1/2)/(1/2 + 3/2) = 1/4 = 0.25\). Our draw of 0.407 is above the mean, which is fine &mdash; the distribution has substantial spread at \(d = 4\).</p>
+
+            <p><strong>Gaussian approximation:</strong> \(u_1 = 0.638\). The approximation says \(u_1 \approx \mathcal{N}(0, 1/4)\), so \(\operatorname{SD} = 0.5\). Our value of 0.638 is 1.28 standard deviations out &mdash; perfectly typical. At \(d = 4\) the approximation is coarse; at \(d = 128\) (a real LLM head dimension) it would be far more accurate.</p>
+        </div>
+
+        <div class="example-worked">
+            <h4>Worked Example A.8: Why the Dirichlet constraint matters (and why it doesn't)</h4>
+            <p><em>Problem:</em> In the Dirichlet vector above, suppose you observe that \(u_1^2 = 0.9\) (one coordinate hogs 90% of the squared norm). What can you say about the remaining coordinates?</p>
+
+            <p><em>Solution:</em> Since \(\sum u_i^2 = 1\), the remaining three squared coordinates must share \(1 - 0.9 = 0.1\). Their conditional distribution is \(\operatorname{Dir}(1/2, 1/2, 1/2)\) rescaled to sum to 0.1 instead of 1. Each remaining coordinate has conditional mean \(0.1/3 \approx 0.033\), much less than the unconditional mean of \(0.25\).</p>
+
+            <p>This is the negative covariance at work: knowing one coordinate is large <em>forces</em> the others to be small. But at \(d = 1000\), the probability of any single coordinate hogging 90% of the norm is astronomically small (it would require a \(\operatorname{Beta}(1/2, 499.5)\) random variable to take the value 0.9, which is many hundreds of standard deviations from the mean of 0.001). In practice, no coordinate deviates enough from \(1/d\) to meaningfully constrain the others. That's the concentration of measure argument for near-independence.</p>
+        </div>
+
+    </article>
+
+    <footer>
+        <p>&copy; 2026 Prateek Chandra Jha</p>
+        <p><a href="index.html">Back to home</a></p>
+    </footer>
+
+    <script>
+        function toggleSolution() {
+            var sol = document.getElementById('solution');
+            var btn = document.querySelector('.toggle-btn');
+            if (sol.classList.contains('hidden')) {
+                sol.classList.remove('hidden');
+                btn.textContent = 'Hide the Answer';
+            } else {
+                sol.classList.add('hidden');
+                btn.textContent = 'Reveal the Answer';
+            }
+        }
+    </script>
+</body>
+</html>
