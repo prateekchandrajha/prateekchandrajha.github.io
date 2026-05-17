@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Johnson-Lindenstrauss Lemma from Scratch | Prateek Chandra Jha</title>
+    <script>
+        MathJax = {
+            chtml: {
+                displayAlign: 'center',
+                displayIndent: '0'
+            },
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['$$', '$$']],
+                macros: {
+                    R: '\\mathbb{R}',
+                    E: '\\mathbb{E}',
+                    Var: '\\operatorname{Var}',
+                    Pr: '\\operatorname{Pr}',
+                    eps: '\\varepsilon',
+                    norm: ['\\left\\| #1 \\right\\|', 1]
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        mjx-container {
+            color: #d4d4d4 !important;
+        }
+        mjx-container[display="true"] {
+            overflow-x: auto;
+            max-width: 100%;
+            padding: 10px 0;
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #d4d4d4;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #0d0d0d;
+        }
+        article {
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.4);
+        }
+        h1 {
+            color: #e8e8e8;
+            font-size: 2.2em;
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #e0e0e0;
+            margin-top: 45px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 8px;
+        }
+        h3 {
+            color: #b0c4de;
+            margin-top: 30px;
+        }
+        h4 {
+            color: #a0b8d0;
+            margin-top: 25px;
+        }
+        .date {
+            color: #777;
+            margin-bottom: 35px;
+            font-size: 0.95em;
+        }
+        a {
+            color: #6db3f2;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #8eccff;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 25px;
+        }
+        .key-idea {
+            background-color: #1a2634;
+            border-left: 4px solid #4a9ede;
+            padding: 18px 20px;
+            margin: 25px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .key-idea strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #8eccff;
+        }
+        .definition-box {
+            background: #1a1a2e;
+            border: 2px solid #4a4a8a;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .definition-box h4 {
+            color: #9a9aff;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .theorem-box {
+            background: #1e1428;
+            border: 2px solid #7a4a9e;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .theorem-box h4 {
+            color: #c49eee;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .lemma-box {
+            background: #14281e;
+            border: 2px solid #4a8a5a;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .lemma-box h4 {
+            color: #6abf7a;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .proof-box {
+            background: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 22px;
+            margin: 20px 0;
+        }
+        .proof-box h4 {
+            color: #e0c080;
+            margin-top: 0;
+        }
+        .proof-end {
+            text-align: right;
+            color: #888;
+            font-size: 1.2em;
+        }
+        .example-box {
+            background: #2a2010;
+            border: 2px solid #a07828;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .example-box h4 {
+            color: #e8b84a;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .intuition-box {
+            background: #0a1628;
+            border-left: 4px solid #4a9ede;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .intuition-box strong {
+            color: #8eccff;
+        }
+        .roadmap {
+            background: #1a2a1a;
+            border: 2px solid #4a7a4a;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .roadmap h3 {
+            color: #6abf6a;
+            margin-top: 0;
+        }
+        .roadmap ol {
+            padding-left: 20px;
+        }
+        .roadmap li {
+            margin-bottom: 8px;
+        }
+        .step-arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #4a9ede;
+            margin: 15px 0;
+        }
+        .warning-box {
+            background: #2a1a1a;
+            border-left: 4px solid #de4a4a;
+            padding: 18px 20px;
+            margin: 25px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .warning-box strong {
+            color: #ff8e8e;
+        }
+        .result-box {
+            background: #0a1628;
+            color: #e0e0e0;
+            padding: 22px;
+            border-radius: 8px;
+            margin: 25px 0;
+            text-align: center;
+            border: 1px solid #2a4a6a;
+        }
+        .toggle-btn {
+            background: #4a4a8a;
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+        .toggle-btn:hover {
+            background: #6a6aaa;
+        }
+        .hidden {
+            display: none;
+        }
+        .toc {
+            background: #1e1e2e;
+            border: 1px solid #3a3a5a;
+            padding: 20px 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .toc h3 {
+            margin-top: 0;
+            color: #9a9aff;
+        }
+        .toc ol {
+            padding-left: 20px;
+        }
+        .toc li {
+            margin-bottom: 6px;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #3a3a3a;
+            padding: 10px 14px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: #252525;
+            color: #e0e0e0;
+        }
+        .comparison-table tr:nth-child(even) {
+            background: #1e1e1e;
+        }
+        blockquote {
+            border-left: 3px solid #4a9ede;
+            padding-left: 18px;
+            margin: 20px 0;
+            color: #aaa;
+            font-style: italic;
+        }
+        .footnote {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 40px;
+            border-top: 1px solid #333;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">&larr; Back to all posts</a>
+    <article>
+        <h1>The Johnson&ndash;Lindenstrauss Lemma from Scratch</h1>
+        <p class="date">May 17, 2026</p>
+
+        <p>
+            The Johnson&ndash;Lindenstrauss (JL) lemma says something that feels like it shouldn't be true:
+            you can take <em>any</em> set of \(n\) points in absurdly high-dimensional space and squash them
+            down into just \(O(\log n)\) dimensions, while approximately preserving every pairwise distance.
+        </p>
+
+        <p>
+            This post is a complete, self-contained walkthrough of the <em>easiest</em> proof I know.
+            Every tool we use &mdash; expectation, variance, moment generating functions, Markov's inequality,
+            the union bound &mdash; will be built up from definitions with examples, so you can see how a
+            collection of small, elementary pieces snap together into one of the most useful results in
+            all of high-dimensional geometry.
+        </p>
+
+        <div class="roadmap">
+            <h3>Proof Roadmap</h3>
+            <p>Here is the complete chain of ideas we will build, one on top of the other:</p>
+            <ol>
+                <li><strong>Expectation &amp; Variance</strong> &mdash; the two fundamental summaries of a random variable.</li>
+                <li><strong>Moment Generating Functions (MGFs)</strong> &mdash; a device that encodes all moments in one function.</li>
+                <li><strong>Markov's Inequality</strong> &mdash; the most basic probability tail bound.</li>
+                <li><strong>The MGF Chernoff Method</strong> &mdash; combining Markov with MGFs to get exponentially sharp tail bounds.</li>
+                <li><strong>Sub-Gaussian Random Variables</strong> &mdash; the key property of Gaussian projections.</li>
+                <li><strong>Concentration of \(\chi^2\)</strong> &mdash; a sum of squared Gaussians concentrates around its mean.</li>
+                <li><strong>The JL Lemma for a Single Pair</strong> &mdash; random projection nearly preserves one distance.</li>
+                <li><strong>Union Bound</strong> &mdash; from one pair to all \(\binom{n}{2}\) pairs simultaneously.</li>
+                <li><strong>The Full JL Lemma</strong> &mdash; putting it all together.</li>
+            </ol>
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s1">1. The Statement</h2>
+        <!-- ============================================================ -->
+
+        <p>Let's state what we're trying to prove before building the machinery.</p>
+
+        <div class="theorem-box">
+            <h4>Theorem (Johnson&ndash;Lindenstrauss, 1984)</h4>
+            <p>
+                For any \(0 < \eps < 1\), any integer \(n \ge 2\), and any set \(P\) of \(n\) points in
+                \(\R^d\), there exists a map \(f : \R^d \to \R^k\) with
+            </p>
+            $$k = O\!\left(\frac{\log n}{\eps^2}\right)$$
+            <p>such that for <em>every</em> pair \(u, v \in P\):</p>
+            $$(1 - \eps)\,\norm{u - v}^2 \;\le\; \norm{f(u) - f(v)}^2 \;\le\; (1 + \eps)\,\norm{u - v}^2.$$
+        </div>
+
+        <p>
+            Read that again: the target dimension \(k\) depends only on the <em>number of points</em> \(n\) and
+            the distortion tolerance \(\eps\). It is completely independent of the original dimension \(d\).
+            You could start in \(\R^{1{,}000{,}000}\) and, with say 1000 points and 10% distortion, land
+            in roughly \(k \approx 700\) dimensions.
+        </p>
+
+        <div class="example-box">
+            <h4>Concrete Example</h4>
+            <p>
+                Suppose you have \(n = 10{,}000\) images, each represented as a vector in
+                \(\R^{1{,}000{,}000}\) (a million pixel-intensities). You want to preserve all
+                pairwise distances up to \(\eps = 0.1\) (10% distortion). The JL lemma says
+                you can project down to:
+            </p>
+            $$k = C \cdot \frac{\log 10{,}000}{0.01} = C \cdot \frac{4 \ln 10}{0.01} \approx 921\,C$$
+            <p>
+                where \(C\) is a modest constant (around 4&ndash;8 depending on the proof). So roughly
+                \(k \sim 4{,}000\) to \(8{,}000\) dimensions suffice &mdash; a compression from a million
+                down to a few thousand, with all distances nearly intact.
+            </p>
+        </div>
+
+        <div class="intuition-box">
+            <strong>Why should this be possible?</strong> In high dimensions, most of the "volume" is
+            concentrated in a thin shell. Random directions are nearly orthogonal to each other.
+            A random subspace of dimension \(O(\log n)\) is rich enough to approximately capture
+            the geometry of any \(n\) points &mdash; because there are only \(\binom{n}{2}\) pairwise
+            distances to preserve, and each one is determined by just one direction.
+        </div>
+
+        <p>
+            The proof strategy: we will construct \(f\) as a <strong>random linear map</strong>.
+            Specifically, we take a \(k \times d\) matrix \(A\) whose entries are i.i.d. \(\mathcal{N}(0, 1)\),
+            and define:
+        </p>
+        $$f(x) = \frac{1}{\sqrt{k}}\,A\,x.$$
+        <p>
+            We will show that for any <em>fixed</em> pair of points, this map preserves their distance
+            with high probability. Then a union bound over all \(\binom{n}{2}\) pairs finishes the job.
+        </p>
+
+        <!-- ============================================================ -->
+        <h2 id="s2">2. Expectation and Variance</h2>
+        <!-- ============================================================ -->
+
+        <p>We start at the very beginning. These are the two most fundamental summaries of a random variable.</p>
+
+        <div class="definition-box">
+            <h4>Definition: Expected Value</h4>
+            <p>
+                Let \(X\) be a random variable taking values in \(\R\). If \(X\) is discrete with
+                possible values \(x_1, x_2, \ldots\) and probabilities \(p_1, p_2, \ldots\), then:
+            </p>
+            $$\E[X] = \sum_{i} x_i \, p_i.$$
+            <p>
+                If \(X\) is continuous with probability density function \(f_X\), then:
+            </p>
+            $$\E[X] = \int_{-\infty}^{\infty} x \, f_X(x) \, dx.$$
+            <p>
+                The expected value is the "center of mass" of the distribution of \(X\).
+            </p>
+        </div>
+
+        <div class="example-box">
+            <h4>Example: Fair Die</h4>
+            <p>Roll a fair six-sided die. The random variable \(X\) takes values \(1, 2, 3, 4, 5, 6\), each with probability \(1/6\).</p>
+            $$\E[X] = \frac{1}{6}(1 + 2 + 3 + 4 + 5 + 6) = \frac{21}{6} = 3.5.$$
+            <p>The expected value 3.5 is not even a possible outcome &mdash; it's the long-run average.</p>
+        </div>
+
+        <h3>Linearity of Expectation</h3>
+
+        <p>The single most useful property of expectation: for <em>any</em> random variables \(X, Y\) (dependent or not):</p>
+        $$\E[X + Y] = \E[X] + \E[Y].$$
+
+        <div class="proof-box">
+            <h4>Proof (discrete case)</h4>
+            <p>
+                Let \(X\) and \(Y\) be discrete random variables on the same probability space.
+                By definition of expectation over the joint distribution:
+            </p>
+            $$\E[X + Y] = \sum_{x}\sum_{y}(x + y)\,\Pr(X = x, Y = y)$$
+            $$= \sum_{x}\sum_{y} x \,\Pr(X = x, Y = y) + \sum_{x}\sum_{y} y \,\Pr(X = x, Y = y)$$
+            <p>In the first sum, \(x\) doesn't depend on \(y\), so summing over \(y\) gives the marginal:</p>
+            $$= \sum_{x} x \,\Pr(X = x) + \sum_{y} y \, \Pr(Y = y) = \E[X] + \E[Y].$$
+            <p>Notice we never assumed independence.</p>
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="definition-box">
+            <h4>Definition: Variance</h4>
+            <p>
+                The variance of a random variable \(X\) measures how spread out it is around its mean
+                \(\mu = \E[X]\):
+            </p>
+            $$\Var(X) = \E\!\big[(X - \mu)^2\big] = \E[X^2] - (\E[X])^2.$$
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof of the shortcut formula \(\Var(X) = \E[X^2] - (\E[X])^2\)</h4>
+            <p>Expand the square inside the expectation:</p>
+            $$\Var(X) = \E[(X - \mu)^2] = \E[X^2 - 2\mu X + \mu^2]$$
+            <p>By linearity of expectation (and the fact that \(\mu\) is a constant):</p>
+            $$= \E[X^2] - 2\mu\,\E[X] + \mu^2 = \E[X^2] - 2\mu^2 + \mu^2 = \E[X^2] - \mu^2.$$
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="example-box">
+            <h4>Example: Fair Die Variance</h4>
+            <p>We already know \(\E[X] = 3.5\). Now:</p>
+            $$\E[X^2] = \frac{1}{6}(1 + 4 + 9 + 16 + 25 + 36) = \frac{91}{6} \approx 15.17.$$
+            $$\Var(X) = \frac{91}{6} - \left(\frac{7}{2}\right)^2 = \frac{91}{6} - \frac{49}{4} = \frac{182 - 147}{12} = \frac{35}{12} \approx 2.92.$$
+        </div>
+
+        <h3>Variance of Independent Sums</h3>
+
+        <div class="lemma-box">
+            <h4>Fact: Variance of a Sum of Independent Variables</h4>
+            <p>If \(X_1, \ldots, X_k\) are <em>independent</em>, then:</p>
+            $$\Var(X_1 + \cdots + X_k) = \Var(X_1) + \cdots + \Var(X_k).$$
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof (for two variables; the general case follows by induction)</h4>
+            <p>Let \(S = X + Y\) with \(X, Y\) independent. Write \(\mu_X = \E[X]\), \(\mu_Y = \E[Y]\).</p>
+            $$\Var(S) = \E[(S - \E[S])^2] = \E[((X - \mu_X) + (Y - \mu_Y))^2]$$
+            $$= \E[(X - \mu_X)^2] + 2\,\E[(X - \mu_X)(Y - \mu_Y)] + \E[(Y - \mu_Y)^2].$$
+            <p>The cross term: since \(X, Y\) are independent,</p>
+            $$\E[(X - \mu_X)(Y - \mu_Y)] = \E[X - \mu_X]\cdot\E[Y - \mu_Y] = 0 \cdot 0 = 0.$$
+            <p>So \(\Var(S) = \Var(X) + \Var(Y)\).</p>
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s3">3. Moment Generating Functions</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            The moment generating function (MGF) is a single function that packages
+            <em>all</em> the moments \(\E[X], \E[X^2], \E[X^3], \ldots\) of a random variable
+            into one tidy object. It is the secret weapon behind every sharp concentration inequality.
+        </p>
+
+        <div class="definition-box">
+            <h4>Definition: Moment Generating Function</h4>
+            <p>For a random variable \(X\), the MGF is the function:</p>
+            $$M_X(t) = \E[e^{tX}]$$
+            <p>defined for all \(t \in \R\) where this expectation is finite.</p>
+        </div>
+
+        <h3>Why "moment generating"?</h3>
+
+        <p>Recall the Taylor expansion of the exponential:</p>
+        $$e^{tX} = 1 + tX + \frac{(tX)^2}{2!} + \frac{(tX)^3}{3!} + \cdots$$
+
+        <p>Taking expectations term-by-term (justified when the MGF exists in a neighborhood of 0):</p>
+        $$M_X(t) = \E[e^{tX}] = 1 + t\,\E[X] + \frac{t^2}{2!}\,\E[X^2] + \frac{t^3}{3!}\,\E[X^3] + \cdots$$
+
+        <p>So the \(n\)-th derivative at \(t = 0\) gives the \(n\)-th moment:</p>
+        $$M_X^{(n)}(0) = \E[X^n].$$
+
+        <div class="example-box">
+            <h4>Example: MGF of a Standard Normal</h4>
+            <p>Let \(Z \sim \mathcal{N}(0, 1)\) with density \(f_Z(z) = \frac{1}{\sqrt{2\pi}} e^{-z^2/2}\). Then:</p>
+            $$M_Z(t) = \E[e^{tZ}] = \int_{-\infty}^{\infty} e^{tz} \cdot \frac{1}{\sqrt{2\pi}} e^{-z^2/2}\,dz.$$
+            <p>Complete the square in the exponent:</p>
+            $$tz - \frac{z^2}{2} = -\frac{1}{2}(z^2 - 2tz) = -\frac{1}{2}(z - t)^2 + \frac{t^2}{2}.$$
+            <p>So:</p>
+            $$M_Z(t) = e^{t^2/2} \int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi}} e^{-(z-t)^2/2}\,dz = e^{t^2/2} \cdot 1 = e^{t^2/2}.$$
+            <p>The integral equals 1 because the integrand is the density of \(\mathcal{N}(t, 1)\).</p>
+            <p>So the MGF of a standard normal is:</p>
+            <div class="result-box">$$M_Z(t) = e^{t^2/2}$$</div>
+            <p>We can verify the moments: \(M_Z'(t) = t\,e^{t^2/2}\), so \(M_Z'(0) = 0 = \E[Z]\). And \(M_Z''(t) = (1 + t^2)\,e^{t^2/2}\), so \(M_Z''(0) = 1 = \E[Z^2]\). Checks out.</p>
+        </div>
+
+        <h3>Key Property: MGFs Factor Under Independence</h3>
+
+        <div class="lemma-box">
+            <h4>Fact</h4>
+            <p>If \(X\) and \(Y\) are independent, then:</p>
+            $$M_{X+Y}(t) = M_X(t) \cdot M_Y(t).$$
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof</h4>
+            $$M_{X+Y}(t) = \E[e^{t(X+Y)}] = \E[e^{tX} \cdot e^{tY}].$$
+            <p>Since \(X\) and \(Y\) are independent, \(e^{tX}\) and \(e^{tY}\) are also independent (functions of independent r.v.'s are independent). For independent random variables, the expectation of a product equals the product of expectations:</p>
+            $$= \E[e^{tX}] \cdot \E[e^{tY}] = M_X(t) \cdot M_Y(t).$$
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="intuition-box">
+            <strong>Why this matters:</strong> When we eventually analyze a sum of independent random variables
+            (which is exactly what a random projection produces), the MGF of the sum will factor into a product
+            of individual MGFs. Products of exponentials are easy to handle &mdash; they just add in the exponent.
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s4">4. Markov's Inequality</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            Markov's inequality is the most elementary tail bound in all of probability.
+            It's almost embarrassingly simple, yet it is the foundation of every sharper
+            bound we'll derive.
+        </p>
+
+        <div class="theorem-box">
+            <h4>Theorem (Markov's Inequality)</h4>
+            <p>Let \(X\) be a <em>non-negative</em> random variable. Then for any \(a > 0\):</p>
+            $$\Pr(X \ge a) \le \frac{\E[X]}{a}.$$
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof</h4>
+            <p>We use a simple indicator trick. Define the indicator random variable:</p>
+            $$\mathbf{1}_{X \ge a} = \begin{cases} 1 & \text{if } X \ge a \\ 0 & \text{otherwise.}\end{cases}$$
+            <p>Since \(X \ge 0\), whenever \(X \ge a\) we certainly have \(X \ge a \cdot 1 = a\). In general:</p>
+            $$X \ge a \cdot \mathbf{1}_{X \ge a}.$$
+            <p>
+                This is the heart of the proof: if \(X < a\), the right side is 0 and the inequality holds
+                trivially (since \(X \ge 0\)). If \(X \ge a\), the right side is \(a\) and the inequality
+                says \(X \ge a\), which is true by assumption.
+            </p>
+            <p>Now take expectations of both sides (expectation preserves inequalities):</p>
+            $$\E[X] \ge a \cdot \E[\mathbf{1}_{X \ge a}] = a \cdot \Pr(X \ge a).$$
+            <p>Dividing both sides by \(a > 0\):</p>
+            $$\Pr(X \ge a) \le \frac{\E[X]}{a}.$$
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="example-box">
+            <h4>Example</h4>
+            <p>
+                Suppose the average commute time in a city is \(\E[X] = 30\) minutes.
+                Without knowing anything else about the distribution, Markov tells us:
+            </p>
+            $$\Pr(X \ge 120) \le \frac{30}{120} = \frac{1}{4}.$$
+            <p>
+                At most 25% of people commute 2 hours or more. This bound is loose &mdash; the
+                real fraction is probably much smaller &mdash; but it's remarkable that we got anything
+                at all from just the average.
+            </p>
+        </div>
+
+        <div class="warning-box">
+            <strong>Limitation:</strong> Markov's inequality requires \(X \ge 0\) and only uses \(\E[X]\).
+            It gives no information about the <em>shape</em> of the distribution. To get sharper bounds,
+            we need to use more information about \(X\). That's where the MGF trick comes in.
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s5">5. The Chernoff Bound Method</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            Here's the beautiful idea: Markov's inequality is weak because it only uses the mean.
+            But what if we applied Markov to a <em>cleverer</em> non-negative random variable derived from \(X\)?
+        </p>
+
+        <h3>The Core Trick</h3>
+
+        <p>
+            For any \(t > 0\), the function \(x \mapsto e^{tx}\) is non-negative and strictly increasing.
+            So for any real-valued \(X\) and any \(a\):
+        </p>
+        $$\Pr(X \ge a) = \Pr(e^{tX} \ge e^{ta}).$$
+
+        <p>Now \(e^{tX}\) is non-negative, so we can apply Markov:</p>
+
+        $$\Pr(X \ge a) = \Pr(e^{tX} \ge e^{ta}) \le \frac{\E[e^{tX}]}{e^{ta}} = e^{-ta}\,M_X(t).$$
+
+        <p>Since this holds for <em>every</em> \(t > 0\), we can optimize:</p>
+
+        <div class="result-box">
+            $$\Pr(X \ge a) \le \inf_{t > 0} \; e^{-ta}\,M_X(t)$$
+        </div>
+
+        <p>This is the <strong>Chernoff bound</strong> (or Chernoff method). Let's make sure every step is clear:</p>
+
+        <div class="proof-box">
+            <h4>Step-by-step derivation</h4>
+            <p><strong>Step 1:</strong> Pick any \(t > 0\). Since \(e^{tx}\) is strictly increasing:
+            \(X \ge a \iff e^{tX} \ge e^{ta}\).</p>
+
+            <p><strong>Step 2:</strong> The random variable \(e^{tX}\) is always positive (the exponential is always positive).
+            Apply Markov's inequality with the non-negative random variable \(e^{tX}\) and threshold \(e^{ta}\):</p>
+            $$\Pr(e^{tX} \ge e^{ta}) \le \frac{\E[e^{tX}]}{e^{ta}}.$$
+
+            <p><strong>Step 3:</strong> Recognize that \(\E[e^{tX}] = M_X(t)\), the moment generating function.</p>
+
+            <p><strong>Step 4:</strong> Since the bound holds for every \(t > 0\), take the infimum (tightest bound)
+            over all \(t > 0\).</p>
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="intuition-box">
+            <strong>Why is this so much better than plain Markov?</strong>
+            Markov uses only \(\E[X]\) &mdash; one number. The Chernoff method uses
+            \(\E[e^{tX}]\) for the best \(t\), which effectively leverages <em>all moments</em>
+            of \(X\) simultaneously (via the Taylor expansion of \(e^{tX}\)). For well-behaved
+            distributions, this gives bounds that decay <em>exponentially</em> in the deviation,
+            not just polynomially.
+        </div>
+
+        <div class="example-box">
+            <h4>Example: Chernoff Bound for a Standard Normal</h4>
+            <p>Let \(Z \sim \mathcal{N}(0,1)\). We showed \(M_Z(t) = e^{t^2/2}\). So for any \(a > 0\):</p>
+            $$\Pr(Z \ge a) \le \inf_{t > 0}\; e^{-ta} \cdot e^{t^2/2} = \inf_{t > 0}\; e^{t^2/2 - ta}.$$
+            <p>Minimize the exponent \(g(t) = t^2/2 - ta\). Take derivative: \(g'(t) = t - a = 0\), so \(t^* = a\). Then:</p>
+            $$\Pr(Z \ge a) \le e^{a^2/2 - a^2} = e^{-a^2/2}.$$
+            <p>This is a <em>Gaussian tail bound</em>: the probability of a standard normal exceeding \(a\) drops like \(e^{-a^2/2}\). For \(a = 3\): Markov gives only \(\Pr(|Z| \ge 3) \le \E[Z^2]/9 = 1/9 \approx 0.11\), while Chernoff gives \(\Pr(Z \ge 3) \le e^{-4.5} \approx 0.011\), much tighter.</p>
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s6">6. Sub-Gaussian Random Variables</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            The Chernoff bound for the standard normal gave us \(\Pr(Z \ge a) \le e^{-a^2/2}\).
+            The key input was that \(M_Z(t) = e^{t^2/2}\). Many other random variables have
+            MGFs bounded by a similar Gaussian-like form. These are called <em>sub-Gaussian</em>.
+        </p>
+
+        <div class="definition-box">
+            <h4>Definition: Sub-Gaussian Random Variable</h4>
+            <p>
+                A random variable \(X\) with \(\E[X] = 0\) is called <strong>\(\sigma^2\)-sub-Gaussian</strong> if
+                its MGF satisfies:
+            </p>
+            $$M_X(t) = \E[e^{tX}] \le e^{\sigma^2 t^2 / 2} \qquad \text{for all } t \in \R.$$
+            <p>
+                In words: the MGF of \(X\) is dominated by the MGF of a \(\mathcal{N}(0, \sigma^2)\) random variable.
+            </p>
+        </div>
+
+        <div class="example-box">
+            <h4>Examples of Sub-Gaussian Random Variables</h4>
+            <table class="comparison-table">
+                <tr>
+                    <th>Random Variable</th>
+                    <th>Sub-Gaussian parameter \(\sigma^2\)</th>
+                </tr>
+                <tr>
+                    <td>\(\mathcal{N}(0, \sigma^2)\)</td>
+                    <td>\(\sigma^2\) (exactly)</td>
+                </tr>
+                <tr>
+                    <td>Rademacher: \(\pm 1\) with prob \(1/2\) each</td>
+                    <td>\(1\)</td>
+                </tr>
+                <tr>
+                    <td>Uniform on \([-a, a]\)</td>
+                    <td>\(a^2\)</td>
+                </tr>
+                <tr>
+                    <td>Any bounded r.v. on \([a, b]\) with mean 0</td>
+                    <td>\((b-a)^2/4\) (Hoeffding)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="proof-box">
+            <h4>Why is a Rademacher variable 1-sub-Gaussian?</h4>
+            <p>Let \(X = \pm 1\) with equal probability. Then:</p>
+            $$M_X(t) = \E[e^{tX}] = \frac{e^t + e^{-t}}{2} = \cosh(t).$$
+            <p>We need to show \(\cosh(t) \le e^{t^2/2}\) for all \(t\). Use the Taylor series:</p>
+            $$\cosh(t) = \sum_{k=0}^{\infty} \frac{t^{2k}}{(2k)!}, \qquad e^{t^2/2} = \sum_{k=0}^{\infty} \frac{t^{2k}}{2^k \cdot k!}.$$
+            <p>We need \(\frac{1}{(2k)!} \le \frac{1}{2^k \cdot k!}\) for all \(k \ge 0\). This is equivalent to \(2^k \cdot k! \le (2k)!\).</p>
+            <p>Check by induction. Base case \(k=0\): \(1 \le 1\). Inductive step: assume \(2^k \cdot k! \le (2k)!\). Then:</p>
+            $$2^{k+1}(k+1)! = 2 \cdot (k+1) \cdot 2^k \cdot k! \le 2(k+1) \cdot (2k)!.$$
+            <p>We need \(2(k+1)(2k)! \le (2k+2)! = (2k+2)(2k+1)(2k)!\), i.e., \(2(k+1) \le (2k+2)(2k+1)\). Since \(2k+2 = 2(k+1)\), this becomes \(1 \le 2k+1\), true for \(k \ge 0\).</p>
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <h3>Why sub-Gaussians matter</h3>
+
+        <p>
+            Applying the Chernoff method to a \(\sigma^2\)-sub-Gaussian variable \(X\) immediately gives:
+        </p>
+
+        $$\Pr(X \ge a) \le \inf_{t > 0}\; e^{-ta} \cdot e^{\sigma^2 t^2/2}.$$
+
+        <p>Optimizing: \(g(t) = \sigma^2 t^2/2 - ta\), \(g'(t) = \sigma^2 t - a = 0\), so \(t^* = a/\sigma^2\):</p>
+
+        <div class="result-box">
+            $$\Pr(X \ge a) \le e^{-a^2/(2\sigma^2)} \qquad \text{(sub-Gaussian tail bound)}$$
+        </div>
+
+        <p>By symmetry (if \(-X\) is also \(\sigma^2\)-sub-Gaussian, which it is when \(X\) is symmetric or Gaussian):</p>
+        $$\Pr(|X| \ge a) \le 2\,e^{-a^2/(2\sigma^2)}.$$
+
+        <!-- ============================================================ -->
+        <h2 id="s7">7. Gaussian Vectors and the Chi-Squared Distribution</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            A random projection maps a vector \(v \in \R^d\) to \(\frac{1}{\sqrt{k}} A v\) where
+            \(A\) is a \(k \times d\) matrix of i.i.d. standard normals. To analyze what happens to
+            the length of \(v\), we need to understand the distribution of the squared norm of a Gaussian vector.
+        </p>
+
+        <div class="definition-box">
+            <h4>Definition: Chi-Squared Distribution</h4>
+            <p>
+                If \(Z_1, \ldots, Z_k\) are independent \(\mathcal{N}(0,1)\) random variables, then the sum
+            </p>
+            $$Q = Z_1^2 + Z_2^2 + \cdots + Z_k^2$$
+            <p>
+                has the <strong>chi-squared distribution with \(k\) degrees of freedom</strong>, written \(Q \sim \chi^2_k\).
+            </p>
+        </div>
+
+        <h3>Mean and Variance of \(\chi^2_k\)</h3>
+
+        <div class="lemma-box">
+            <h4>Fact</h4>
+            <p>If \(Q \sim \chi^2_k\), then \(\E[Q] = k\) and \(\Var(Q) = 2k\).</p>
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof</h4>
+            <p><strong>Mean:</strong> Each \(Z_i \sim \mathcal{N}(0,1)\), so \(\E[Z_i^2] = \Var(Z_i) + (\E[Z_i])^2 = 1 + 0 = 1\). By linearity:</p>
+            $$\E[Q] = \sum_{i=1}^{k} \E[Z_i^2] = k.$$
+
+            <p><strong>Variance:</strong> We need \(\Var(Z_i^2)\). Since \(\E[Z_i^2] = 1\), we need \(\E[Z_i^4]\).</p>
+            <p>For \(Z \sim \mathcal{N}(0,1)\):</p>
+            $$\E[Z^4] = \int_{-\infty}^{\infty} z^4 \cdot \frac{1}{\sqrt{2\pi}} e^{-z^2/2}\,dz.$$
+            <p>Integrate by parts with \(u = z^3\), \(dv = z \cdot \frac{1}{\sqrt{2\pi}}e^{-z^2/2}\,dz\). Note \(v = -\frac{1}{\sqrt{2\pi}}e^{-z^2/2}\). The boundary terms vanish, giving:</p>
+            $$\E[Z^4] = 3\,\E[Z^2] = 3.$$
+            <p>(More directly: from the MGF \(M_Z(t) = e^{t^2/2}\), we get \(M_Z^{(4)}(0) = 3\).)</p>
+            <p>So \(\Var(Z_i^2) = \E[Z_i^4] - (\E[Z_i^2])^2 = 3 - 1 = 2\).</p>
+            <p>Since the \(Z_i\) are independent, the \(Z_i^2\) are also independent, so:</p>
+            $$\Var(Q) = \sum_{i=1}^{k} \Var(Z_i^2) = 2k.$$
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="intuition-box">
+            <strong>What this tells us:</strong> The random variable \(Q/k\) (a normalized chi-squared) has
+            mean 1 and variance \(2/k\). As \(k\) grows, \(Q/k\) concentrates tightly around 1. This is
+            the seed of the JL lemma: the squared norm of a random projection, when properly normalized,
+            concentrates around the original squared norm.
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s8">8. Concentration of Chi-Squared: The Key Lemma</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            This is the technical heart of the entire proof. We need to show that
+            \(Q/k\) is not just close to 1 <em>on average</em>, but close to 1 with
+            <em>exponentially high probability</em>.
+        </p>
+
+        <div class="lemma-box">
+            <h4>Lemma (Chi-Squared Concentration)</h4>
+            <p>Let \(Q \sim \chi^2_k\). For any \(0 < \eps < 1\):</p>
+            $$\Pr\!\left(\frac{Q}{k} \ge 1 + \eps\right) \le \left(\frac{e^{\eps}}{(1 + \eps)^{1+\eps}}\right)^{k/2}$$
+            $$\Pr\!\left(\frac{Q}{k} \le 1 - \eps\right) \le \left(\frac{e^{-\eps}}{(1 - \eps)^{1-\eps}}\right)^{k/2}$$
+            <p>In particular, both probabilities are at most \(e^{-k\eps^2/8}\) for \(0 < \eps < 1\).</p>
+        </div>
+
+        <p>
+            Before proving this, let's build the two ingredients we need: the MGF of a \(\chi^2_1\) random variable,
+            and the Chernoff method applied to a sum.
+        </p>
+
+        <h3>Step 1: MGF of \(Z^2\) where \(Z \sim \mathcal{N}(0,1)\)</h3>
+
+        <div class="lemma-box">
+            <h4>Claim</h4>
+            <p>If \(Z \sim \mathcal{N}(0,1)\) and \(t < 1/2\), then:</p>
+            $$M_{Z^2}(t) = \E[e^{tZ^2}] = \frac{1}{\sqrt{1 - 2t}}.$$
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof</h4>
+            <p>Compute directly:</p>
+            $$\E[e^{tZ^2}] = \int_{-\infty}^{\infty} e^{tz^2} \cdot \frac{1}{\sqrt{2\pi}} e^{-z^2/2}\,dz = \int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi}} e^{-z^2(1/2 - t)}\,dz.$$
+            <p>For this to converge, we need \(1/2 - t > 0\), i.e., \(t < 1/2\). Let \(\sigma^2 = \frac{1}{1 - 2t}\). Then:</p>
+            $$= \int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi}} e^{-z^2/(2\sigma^2)}\,dz = \frac{1}{\sqrt{2\pi}} \cdot \sigma\sqrt{2\pi} = \sigma = \frac{1}{\sqrt{1-2t}}.$$
+            <p>The integral equals \(\sigma\sqrt{2\pi}\) because it's the integral of an (unnormalized) Gaussian with variance \(\sigma^2\).</p>
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <h3>Step 2: MGF of the Chi-Squared Sum</h3>
+
+        <p>Since \(Q = Z_1^2 + \cdots + Z_k^2\) with independent \(Z_i\), the factoring property of MGFs gives:</p>
+
+        $$M_Q(t) = \prod_{i=1}^{k} M_{Z_i^2}(t) = \left(\frac{1}{\sqrt{1-2t}}\right)^k = (1 - 2t)^{-k/2}.$$
+
+        <h3>Step 3: Apply the Chernoff Method</h3>
+
+        <div class="proof-box">
+            <h4>Proof of the Upper Tail: \(\Pr(Q/k \ge 1 + \eps)\)</h4>
+            <p>We want to bound \(\Pr(Q \ge k(1+\eps))\). By the Chernoff method, for any \(0 < t < 1/2\):</p>
+            $$\Pr(Q \ge k(1+\eps)) \le e^{-tk(1+\eps)} \cdot M_Q(t) = e^{-tk(1+\eps)} \cdot (1-2t)^{-k/2}.$$
+            <p>Optimize over \(t\). Let \(h(t) = -t(1+\eps) - \frac{1}{2}\ln(1-2t)\). We want to minimize this (the exponent is \(k \cdot h(t)\), and we want the bound \(e^{k \cdot h(t)}\) as small as possible).</p>
+            $$h'(t) = -(1+\eps) + \frac{1}{1-2t} = 0 \implies 1 - 2t = \frac{1}{1+\eps} \implies t^* = \frac{\eps}{2(1+\eps)}.$$
+            <p>Check: \(0 < t^* < 1/2\) for \(\eps > 0\). Good. Substituting back:</p>
+            $$1 - 2t^* = \frac{1}{1+\eps}, \qquad t^*(1+\eps) = \frac{\eps}{2}.$$
+            $$h(t^*) = -\frac{\eps}{2} + \frac{1}{2}\ln(1+\eps).$$
+            <p>So the bound is:</p>
+            $$\Pr\!\left(\frac{Q}{k} \ge 1+\eps\right) \le e^{k(-\eps/2 + \ln(1+\eps)/2)} = \left(\frac{(1+\eps)^{1/2}}{e^{\eps/2}}\right)^k = \left(\frac{e^{\eps}}{(1+\eps)^{1+\eps}}\right)^{k/2}.$$
+            <p>(The last step: raise to the power \(k\), rearrange, and note we can write the exponent in the stated form.)</p>
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof of the Lower Tail: \(\Pr(Q/k \le 1 - \eps)\)</h4>
+            <p>
+                For the lower tail, we use the trick: \(\Pr(Q \le k(1-\eps)) = \Pr(-Q \ge -k(1-\eps))\).
+                Apply the Chernoff method with \(e^{-tQ}\) for \(t > 0\):
+            </p>
+            $$\Pr(Q \le k(1-\eps)) = \Pr(e^{-tQ} \ge e^{-tk(1-\eps)}) \le e^{tk(1-\eps)} \cdot \E[e^{-tQ}].$$
+            <p>Now \(\E[e^{-tQ}] = M_Q(-t) = (1+2t)^{-k/2}\) (valid for all \(t > 0\)). So:</p>
+            $$\Pr(Q \le k(1-\eps)) \le e^{tk(1-\eps)} \cdot (1+2t)^{-k/2}.$$
+            <p>Optimize: set \(t^* = \frac{\eps}{2(1-\eps)}\) (by the same calculus). Substituting gives the stated bound.</p>
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <h3>Simplifying to get \(e^{-k\eps^2/8}\)</h3>
+
+        <p>The exact bounds above are a bit unwieldy. We now show they imply the cleaner bound \(e^{-k\eps^2/8}\) for \(0 < \eps < 1\).</p>
+
+        <div class="proof-box">
+            <h4>Simplification</h4>
+            <p>It suffices to show that for \(0 < \eps < 1\):</p>
+            $$\frac{\eps}{2} - \frac{\ln(1+\eps)}{2} \ge \frac{\eps^2}{8}.$$
+            <p>Equivalently: \(\eps - \ln(1+\eps) \ge \eps^2/4\). Define \(f(\eps) = \eps - \ln(1+\eps) - \eps^2/4\). Then \(f(0) = 0\) and:</p>
+            $$f'(\eps) = 1 - \frac{1}{1+\eps} - \frac{\eps}{2} = \frac{\eps}{1+\eps} - \frac{\eps}{2} = \eps\left(\frac{1}{1+\eps} - \frac{1}{2}\right) = \eps \cdot \frac{1 - \eps}{2(1+\eps)}.$$
+            <p>For \(0 < \eps < 1\), we have \(f'(\eps) > 0\). Since \(f(0) = 0\) and \(f\) is increasing on \((0,1)\), we get \(f(\eps) \ge 0\) for \(\eps \in [0, 1]\). A similar (slightly more involved) calculation handles the lower tail.</p>
+
+            <p>Therefore both tails satisfy:</p>
+            <div class="result-box">
+                $$\Pr\!\left(\left|\frac{Q}{k} - 1\right| \ge \eps\right) \le 2\,e^{-k\eps^2/8}$$
+            </div>
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="example-box">
+            <h4>Example: How tight is the concentration?</h4>
+            <p>Take \(k = 1000\) and \(\eps = 0.1\). Then:</p>
+            $$\Pr\!\left(\left|\frac{Q}{1000} - 1\right| \ge 0.1\right) \le 2\,e^{-1000 \cdot 0.01/8} = 2\,e^{-1.25} \approx 0.57.$$
+            <p>That's for \(k = 1000\). With \(k = 10{,}000\):</p>
+            $$2\,e^{-10000 \cdot 0.01 / 8} = 2\,e^{-12.5} \approx 7.4 \times 10^{-6}.$$
+            <p>The concentration becomes extremely strong as \(k\) grows. The constant 8 in the denominator is not tight &mdash; more careful analysis can replace it with roughly \(2 + 2/3\) &mdash; but \(1/8\) suffices for our purposes.</p>
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s9">9. Random Projection Preserves One Distance</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            Now we connect chi-squared concentration to random projections. This is where the pieces
+            start clicking together.
+        </p>
+
+        <h3>The Setup</h3>
+
+        <p>
+            Let \(A\) be a \(k \times d\) matrix with i.i.d. entries \(A_{ij} \sim \mathcal{N}(0, 1)\).
+            Define the random projection:
+        </p>
+        $$f(x) = \frac{1}{\sqrt{k}}\,A\,x, \qquad x \in \R^d.$$
+
+        <p>
+            Fix a single vector \(v \in \R^d\) (think of \(v = u_1 - u_2\) as the difference between two data points).
+            We want to analyze \(\norm{f(v)}^2\).
+        </p>
+
+        <div class="lemma-box">
+            <h4>Lemma (Single-Vector Projection)</h4>
+            <p>For any fixed \(v \in \R^d\) with \(v \ne 0\) and any \(0 < \eps < 1\):</p>
+            $$\Pr\!\left(\left|\,\norm{f(v)}^2 - \norm{v}^2\,\right| \ge \eps\,\norm{v}^2\right) \le 2\,e^{-k\eps^2/8}.$$
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof</h4>
+            <p><strong>Step 1: Compute \(\norm{f(v)}^2\).</strong></p>
+            <p>The \(i\)-th coordinate of \(f(v) = \frac{1}{\sqrt{k}} Av\) is:</p>
+            $$[f(v)]_i = \frac{1}{\sqrt{k}} \sum_{j=1}^{d} A_{ij}\,v_j.$$
+
+            <p>Each \(A_{ij}\) is independent \(\mathcal{N}(0,1)\), so the sum \(W_i = \sum_{j=1}^{d} A_{ij}\,v_j\) is a linear combination of independent normals.</p>
+
+            <p><strong>Step 2: What is the distribution of \(W_i\)?</strong></p>
+            <p>A linear combination of independent normals is normal. The mean is 0 (since each \(A_{ij}\) has mean 0). The variance is:</p>
+            $$\Var(W_i) = \sum_{j=1}^{d} v_j^2 \,\Var(A_{ij}) = \sum_{j=1}^{d} v_j^2 = \norm{v}^2.$$
+            <p>So \(W_i \sim \mathcal{N}(0, \norm{v}^2)\), and we can write \(W_i = \norm{v} \cdot Z_i\) where \(Z_i \sim \mathcal{N}(0,1)\).</p>
+
+            <p><strong>Step 3: Different rows are independent.</strong></p>
+            <p>The rows of \(A\) are independent (each is a fresh draw of \(d\) independent Gaussians), so \(W_1, \ldots, W_k\) are independent.</p>
+
+            <p><strong>Step 4: Express \(\norm{f(v)}^2\) in terms of chi-squared.</strong></p>
+            $$\norm{f(v)}^2 = \sum_{i=1}^{k} [f(v)]_i^2 = \frac{1}{k}\sum_{i=1}^{k} W_i^2 = \frac{\norm{v}^2}{k}\sum_{i=1}^{k} Z_i^2 = \frac{\norm{v}^2}{k}\,Q$$
+            <p>where \(Q = \sum_{i=1}^{k} Z_i^2 \sim \chi^2_k\).</p>
+
+            <p><strong>Step 5: Apply chi-squared concentration.</strong></p>
+            $$\left|\norm{f(v)}^2 - \norm{v}^2\right| = \norm{v}^2 \cdot \left|\frac{Q}{k} - 1\right|.$$
+            <p>So:</p>
+            $$\Pr\!\left(\left|\norm{f(v)}^2 - \norm{v}^2\right| \ge \eps\,\norm{v}^2\right) = \Pr\!\left(\left|\frac{Q}{k} - 1\right| \ge \eps\right) \le 2\,e^{-k\eps^2/8}.$$
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="key-idea">
+            <strong>The reduction in a nutshell:</strong>
+            The squared norm of a random Gaussian projection of \(v\) is just
+            \(\norm{v}^2\) times a normalized chi-squared. So the question "does the
+            projection preserve length?" reduces to "does chi-squared concentrate
+            around its mean?" &mdash; which we already answered.
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s10">10. The Union Bound</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            We've shown that a random projection preserves the length of any <em>one</em> vector
+            with high probability. But we need it to work for <em>all</em> \(\binom{n}{2}\) pairwise
+            difference vectors simultaneously. The tool for this is the union bound.
+        </p>
+
+        <div class="theorem-box">
+            <h4>Theorem (Union Bound / Boole's Inequality)</h4>
+            <p>For any (finite or countable) collection of events \(E_1, E_2, \ldots, E_m\):</p>
+            $$\Pr(E_1 \cup E_2 \cup \cdots \cup E_m) \le \Pr(E_1) + \Pr(E_2) + \cdots + \Pr(E_m).$$
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof</h4>
+            <p>We prove it for two events first, then extend by induction.</p>
+            <p><strong>Two events:</strong> By inclusion-exclusion,</p>
+            $$\Pr(E_1 \cup E_2) = \Pr(E_1) + \Pr(E_2) - \Pr(E_1 \cap E_2).$$
+            <p>Since \(\Pr(E_1 \cap E_2) \ge 0\), we get \(\Pr(E_1 \cup E_2) \le \Pr(E_1) + \Pr(E_2)\).</p>
+
+            <p><strong>General case by induction:</strong> Assume true for \(m-1\) events. Then:</p>
+            $$\Pr\!\left(\bigcup_{i=1}^{m} E_i\right) = \Pr\!\left(\left(\bigcup_{i=1}^{m-1} E_i\right) \cup E_m\right) \le \Pr\!\left(\bigcup_{i=1}^{m-1} E_i\right) + \Pr(E_m)$$
+            $$\le \sum_{i=1}^{m-1}\Pr(E_i) + \Pr(E_m) = \sum_{i=1}^{m}\Pr(E_i).$$
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="example-box">
+            <h4>Example: The Birthday Bound</h4>
+            <p>
+                What's the probability that among 23 people, at least two share a birthday?
+                The union bound over all \(\binom{23}{2} = 253\) pairs, each with collision probability \(1/365\), gives:
+            </p>
+            $$\Pr(\text{collision}) \le 253 \cdot \frac{1}{365} \approx 0.693.$$
+            <p>The true answer is about 0.507 &mdash; the union bound overestimates because it doesn't account for the overlaps, but it's in the right ballpark and trivial to compute.</p>
+        </div>
+
+        <div class="intuition-box">
+            <strong>How we'll use it:</strong> Let \(E_{ij}\) be the "bad event" that the projection distorts
+            the distance between points \(i\) and \(j\) by more than \(\eps\). We've shown
+            \(\Pr(E_{ij}) \le 2e^{-k\eps^2/8}\). The projection fails only if <em>at least one</em>
+            pair is distorted too much, i.e., the event \(\bigcup_{i \lt j} E_{ij}\). The union bound says
+            the failure probability is at most \(\binom{n}{2}\) times the per-pair failure probability.
+            We need \(\binom{n}{2} \cdot 2e^{-k\eps^2/8}\) to be small, which forces \(k = O(\log n / \eps^2)\).
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s11">11. The Full Proof</h2>
+        <!-- ============================================================ -->
+
+        <p>We now have every ingredient. Let's assemble them.</p>
+
+        <div class="theorem-box">
+            <h4>Theorem (JL Lemma &mdash; Restated)</h4>
+            <p>
+                Let \(P = \{x_1, \ldots, x_n\} \subset \R^d\), let \(0 < \eps < 1\), and let
+            </p>
+            $$k \ge \frac{8 \ln n}{\eps^2}.$$
+            <p>
+                Draw a \(k \times d\) random matrix \(A\) with i.i.d. \(\mathcal{N}(0,1)\) entries and define
+                \(f(x) = \frac{1}{\sqrt{k}} Ax\). Then with probability at least \(1 - 1/n\), for <em>all</em>
+                pairs \(i, j\):
+            </p>
+            $$(1 - \eps)\norm{x_i - x_j}^2 \le \norm{f(x_i) - f(x_j)}^2 \le (1 + \eps)\norm{x_i - x_j}^2.$$
+        </div>
+
+        <div class="proof-box">
+            <h4>Proof</h4>
+            <p><strong>Step 1: Linearity reduces distances to lengths.</strong></p>
+            <p>Since \(f\) is linear: \(f(x_i) - f(x_j) = f(x_i - x_j)\). So:</p>
+            $$\norm{f(x_i) - f(x_j)}^2 = \norm{f(x_i - x_j)}^2.$$
+            <p>It suffices to show that \(f\) approximately preserves the <em>length</em> of every difference vector \(v_{ij} = x_i - x_j\).</p>
+
+            <p><strong>Step 2: Per-pair concentration (from Section 9).</strong></p>
+            <p>For each fixed pair \((i, j)\) with \(i \lt j\), define the bad event:</p>
+            $$E_{ij} = \left\{\left|\,\norm{f(v_{ij})}^2 - \norm{v_{ij}}^2\,\right| > \eps\,\norm{v_{ij}}^2\right\}.$$
+            <p>By the Single-Vector Projection Lemma:</p>
+            $$\Pr(E_{ij}) \le 2\,e^{-k\eps^2/8}.$$
+
+            <p><strong>Step 3: Union bound over all pairs.</strong></p>
+            <p>The number of pairs is \(\binom{n}{2} = \frac{n(n-1)}{2} < \frac{n^2}{2}\). By the union bound:</p>
+            $$\Pr\!\left(\bigcup_{i \lt j} E_{ij}\right) \le \binom{n}{2} \cdot 2\,e^{-k\eps^2/8} \lt \frac{n^2}{2} \cdot 2\,e^{-k\eps^2/8} = n^2\,e^{-k\eps^2/8}.$$
+
+            <p><strong>Step 4: Choose \(k\) to make this small.</strong></p>
+            <p>We want \(n^2\,e^{-k\eps^2/8} \le 1/n\), i.e., \(e^{-k\eps^2/8} \le n^{-3}\), i.e.,</p>
+            $$k\eps^2/8 \ge 3 \ln n \quad \Longleftrightarrow \quad k \ge \frac{24 \ln n}{\eps^2}.$$
+
+            <p>With \(k = \lceil 24 \ln n / \eps^2 \rceil\), we get:</p>
+            $$\Pr(\text{some pair distorted by more than } \eps) \le \frac{1}{n}.$$
+
+            <p>In particular, with probability at least \(1 - 1/n\), <em>every</em> pairwise distance is preserved within factor \((1 \pm \eps)\).</p>
+
+            <p><strong>Remark on the constant:</strong> We used \(k \ge 24\ln n / \eps^2\) for the \(1 - 1/n\) success probability. More generally, to get failure probability at most \(\delta\), we need:</p>
+            $$k \ge \frac{8(2\ln n + \ln(1/\delta))}{\eps^2}.$$
+            <p>The constant 8 can be improved to roughly 3 with a tighter analysis of chi-squared tails. The \(O(\log n / \eps^2)\) scaling is what matters.</p>
+            <p class="proof-end">&#9632;</p>
+        </div>
+
+        <div class="step-arrow">&darr;</div>
+
+        <div class="result-box">
+            <p><strong>The Johnson&ndash;Lindenstrauss Lemma</strong></p>
+            <p>A random Gaussian projection into \(k = O(\log n / \eps^2)\) dimensions preserves all pairwise distances within factor \((1 \pm \eps)\), with high probability.</p>
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s12">12. The Proof at a Glance</h2>
+        <!-- ============================================================ -->
+
+        <p>Here is the entire logical chain, compressed into one view:</p>
+
+        <div class="roadmap">
+            <h3>Dependency Graph of the Proof</h3>
+            <p style="font-family: monospace; white-space: pre; line-height: 1.6; font-size: 0.9em; color: #b0d0b0;">
+  Linearity of Expectation     Variance of Independent Sums
+           \                       /
+            v                     v
+       E[Q] = k              Var(Q) = 2k
+                \               /
+                 \             /
+                  v           v
+             MGF of N(0,1): e^{t²/2}
+                    |
+                    v
+             MGF of Z²: (1-2t)^{-1/2}
+                    |
+                    v
+             MGF of χ²_k: (1-2t)^{-k/2}
+                    |
+         Markov's Inequality
+                    |
+                    v
+            Chernoff Method
+                    |
+                    v
+         χ² Concentration: Pr(|Q/k - 1| ≥ ε) ≤ 2e^{-kε²/8}
+                    |
+                    v
+         Single Pair: Pr(distortion > ε) ≤ 2e^{-kε²/8}
+                    |
+              Union Bound
+                    |
+                    v
+         All Pairs: Pr(any distortion > ε) ≤ n² · 2e^{-kε²/8}
+                    |
+         Choose k = O(log n / ε²)
+                    |
+                    v
+              JL LEMMA ✓
+            </p>
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s13">13. A Worked Numerical Example</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            Let's trace through the entire argument with concrete numbers to make sure
+            nothing is hiding behind the notation.
+        </p>
+
+        <div class="example-box">
+            <h4>Setup</h4>
+            <p>
+                We have \(n = 100\) points in \(\R^{10{,}000}\) and want \(\eps = 0.2\) (20% distortion).
+            </p>
+            <p><strong>Step 1: Choose \(k\).</strong></p>
+            $$k = \left\lceil \frac{24 \ln 100}{0.04}\right\rceil = \left\lceil \frac{24 \times 4.605}{0.04}\right\rceil = \lceil 2763 \rceil = 2763.$$
+            <p>So we project from \(\R^{10{,}000}\) down to \(\R^{2763}\).</p>
+
+            <p><strong>Step 2: Per-pair failure probability.</strong></p>
+            $$2\,e^{-k\eps^2/8} = 2\,e^{-2763 \times 0.04/8} = 2\,e^{-13.815} \approx 2 \times 10^{-6}.$$
+
+            <p><strong>Step 3: Total failure probability.</strong></p>
+            <p>Number of pairs: \(\binom{100}{2} = 4950\).</p>
+            $$\Pr(\text{failure}) \le 4950 \times 2 \times 10^{-6} \approx 0.0099 < 0.01.$$
+
+            <p><strong>Conclusion:</strong> With probability at least 99%, a single random \(2763 \times 10{,}000\) Gaussian matrix, scaled by \(1/\sqrt{2763}\), preserves all 4950 pairwise distances to within 20%. And this takes about 27.6 million random numbers &mdash; easily generated on a laptop.</p>
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s14">14. What Makes This Proof Tick</h2>
+        <!-- ============================================================ -->
+
+        <p>Let me highlight the key ideas that made this proof possible:</p>
+
+        <div class="key-idea">
+            <strong>1. Reduction to a one-dimensional problem.</strong>
+            The projection is a linear map, so preserving distances reduces to preserving the length of each
+            difference vector. The squared length of a Gaussian projection of a fixed vector is a scalar
+            random variable (a scaled chi-squared). We reduced a high-dimensional geometry problem to analyzing
+            a single well-understood distribution.
+        </div>
+
+        <div class="key-idea">
+            <strong>2. The exponential trick (Chernoff method).</strong>
+            Markov's inequality alone gives weak polynomial bounds. The Chernoff method &mdash; applying
+            Markov to \(e^{tX}\) and optimizing over \(t\) &mdash; gives exponential bounds. This is why
+            we can afford the union bound over \(\binom{n}{2} \sim n^2\) pairs: the per-pair failure
+            probability decays like \(e^{-k\eps^2}\), and \(n^2 = e^{2\ln n}\) can be absorbed by
+            choosing \(k \propto \log n\).
+        </div>
+
+        <div class="key-idea">
+            <strong>3. The union bound as the finishing glue.</strong>
+            We didn't need any clever coupling between different pairs. Each pair was analyzed independently,
+            and the union bound &mdash; the crudest way to go from one event to many &mdash; was strong enough
+            because the per-event bound was exponentially sharp.
+        </div>
+
+        <div class="key-idea">
+            <strong>4. Gaussians are magical.</strong>
+            The Gaussian distribution is rotationally invariant: the distribution of \(Av\) depends
+            only on \(\norm{v}\), not on the direction of \(v\). This is why the analysis for
+            one difference vector applies uniformly to all of them, without us having to worry about
+            alignment issues.
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 id="s15">15. Broader Perspective</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            The JL lemma is one of the most applied results in theoretical computer science and machine learning:
+        </p>
+
+        <ul>
+            <li><strong>Nearest-neighbor search:</strong> Project data into low dimensions first, then search. Distances are approximately preserved, so approximate nearest neighbors are preserved.</li>
+            <li><strong>Sketching and streaming:</strong> JL-type projections underlie many streaming algorithms that process massive datasets in small memory.</li>
+            <li><strong>Compressed sensing:</strong> The same random matrix ideas appear in the theory of recovering sparse signals from few measurements.</li>
+            <li><strong>Kernel approximation:</strong> Random features for kernel methods are essentially JL projections in a lifted space.</li>
+        </ul>
+
+        <h3>Extensions and Variations</h3>
+
+        <table class="comparison-table">
+            <tr>
+                <th>Variant</th>
+                <th>Key Idea</th>
+            </tr>
+            <tr>
+                <td>Sparse JL (Achlioptas, 2003)</td>
+                <td>Use entries from \(\{-1, 0, +1\}\) instead of Gaussians &mdash; 2/3 of entries are 0, so projection is faster.</td>
+            </tr>
+            <tr>
+                <td>Fast JL (Ailon-Chazelle, 2009)</td>
+                <td>Use randomized Hadamard transform + sparse projection. Runs in \(O(d \log d)\) time.</td>
+            </tr>
+            <tr>
+                <td>Optimal JL (Larsen-Nelson, 2017)</td>
+                <td>The dimension \(k = \Theta(\log n / \eps^2)\) is optimal: no map (linear or not) can do better.</td>
+            </tr>
+            <tr>
+                <td>Terminal JL</td>
+                <td>Preserve distances from all points to a fixed set of "terminals." Allows even lower \(k\) in some cases.</td>
+            </tr>
+        </table>
+
+        <!-- ============================================================ -->
+        <h2 id="s16">16. Summary</h2>
+        <!-- ============================================================ -->
+
+        <p>
+            We built the JL lemma from absolute scratch. The logical chain was:
+        </p>
+
+        <ol>
+            <li>Define <strong>expectation</strong> and <strong>variance</strong>, prove linearity and the variance-of-sums formula.</li>
+            <li>Define the <strong>moment generating function</strong>, compute it for a standard Gaussian, prove it factors under independence.</li>
+            <li>Prove <strong>Markov's inequality</strong> from the indicator trick.</li>
+            <li>Combine Markov with MGFs to get the <strong>Chernoff method</strong>, yielding exponential tail bounds.</li>
+            <li>Compute the MGF of a <strong>chi-squared</strong> distribution and apply Chernoff to get <strong>chi-squared concentration</strong>.</li>
+            <li>Show that the squared norm of a Gaussian projection of a fixed vector is a <strong>scaled chi-squared</strong>, so it concentrates around the original squared norm.</li>
+            <li>Apply the <strong>union bound</strong> over all \(\binom{n}{2}\) pairs to show all distances are preserved simultaneously.</li>
+            <li>Set \(k = O(\log n / \eps^2)\) to make the union-bounded failure probability small.</li>
+        </ol>
+
+        <p>
+            Each step used only the tools developed in the steps before it. No magic, no black boxes,
+            just small pieces stacked carefully on top of each other. That is how you prove theorems.
+        </p>
+
+        <div class="footnote">
+            <p><strong>References:</strong></p>
+            <ul>
+                <li>W. B. Johnson and J. Lindenstrauss, "Extensions of Lipschitz mappings into a Hilbert space," <em>Contemporary Mathematics</em>, 1984.</li>
+                <li>S. Dasgupta and A. Gupta, "An elementary proof of a theorem of Johnson and Lindenstrauss," <em>Random Structures &amp; Algorithms</em>, 2003.</li>
+                <li>R. Vershynin, <em>High-Dimensional Probability</em>, Cambridge University Press, 2018.</li>
+            </ul>
+        </div>
+    </article>
+</body>
+</html>
