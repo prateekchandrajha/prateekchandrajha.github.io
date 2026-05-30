@@ -9,8 +9,8 @@ Personal website and blog of Prateek Chandra Jha.
 ```
 prateekchandrajha.github.io/
 ├── index.html                # Homepage
+├── prob-puzzles.html          # Blog: Probability Puzzles from Scratch
 ├── vc-rademacher.html        # Blog: VC Dimension and Fundamental Theorem (Part 1)
-├── vc-rademacher-part2.html  # Blog: Rademacher Complexity and the Beautiful Inversion (Part 2)
 ├── turboquant-math.html      # Blog: The Mathematics of Google's TurboQuant
 ├── archive/                  # Older posts (not linked from homepage)
 │   ├── qr-algorithm-confusion.html
