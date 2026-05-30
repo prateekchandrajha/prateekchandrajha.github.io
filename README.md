@@ -11,6 +11,7 @@ prateekchandrajha.github.io/
 ├── index.html                # Homepage
 ├── prob-puzzles.html          # Blog: Probability Puzzles from Scratch
 ├── vc-rademacher.html        # Blog: VC Dimension and Fundamental Theorem (Part 1)
+├── jl-lemma.html             # Blog: The Johnson-Lindenstrauss Lemma from Scratch
 ├── turboquant-math.html      # Blog: The Mathematics of Google's TurboQuant
 ├── archive/                  # Older posts (not linked from homepage)
 │   ├── qr-algorithm-confusion.html
